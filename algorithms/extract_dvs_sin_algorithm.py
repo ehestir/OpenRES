@@ -114,7 +114,12 @@ class ExtractDVSAlgorithm(QgsProcessingAlgorithm):
             length = geom.length()
             straight = math.hypot(end.x() - start.x(), end.y() - start.y())
 
-            dvs = ((elev_start - elev_end) / length) * 100 if length > 0 else None
+            if length > 0:
+                dvs = ((elev_start - elev_end) / length) * 100
+                dvs = max(dvs, 0.00001)
+            else:
+                dvs = None
+                
             sin = (length / straight) if straight > 0 else None
 
             out_layer.changeAttributeValue(feat.id(), dvs_idx, dvs)
