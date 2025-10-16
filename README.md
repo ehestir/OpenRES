@@ -5,6 +5,7 @@
 [![made-with-python](https://img.shields.io/badge/Made%20with-Python-ffd040.svg)](https://www.python.org/)
 [![License: GPL v3](https://img.shields.io/badge/License-GPL%20v3-blue.svg)](https://www.gnu.org/licenses/old-licenses/gpl-3.0.html)
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.17307006.svg)](https://doi.org/10.5281/zenodo.17307006)
+[![OpenRES](https://img.shields.io/badge/QGIS%20Repo-OpenRES-589632)](https://plugins.qgis.org/plugins/OpenRES)
 [![GitHub release](https://img.shields.io/github/v/release/jollygoodjacob/OpenRES)](https://github.com/jollygoodjacob/OpenRES/releases)
 [![GitHub commits](https://img.shields.io/github/commits-since/jollygoodjacob/OpenRES/v1.0.1)](https://github.com/jollygoodjacob/OpenRES/commits)
 [![Maintenance](https://img.shields.io/badge/Maintained%3F-yes-green.svg)](https://GitHub.com/jollygoodjacob/OpenRES/graphs/commit-activity)
