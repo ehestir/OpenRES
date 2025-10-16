@@ -74,10 +74,14 @@ Future versions of **OpenRES** will likely extend the number of features to incl
 
 > **Note:** OpenRES requires QGIS version \>=3.28.
 
+**Installation from QGIS:**
+
+- Open QGIS -> Plugins -> Manage and Install Plugins... -> select All tab -> search for OpenRES --> select and install plugin
+
 **Offline installation from .zip file** :
 
 -  Go to releases of this repository -\> select desired version -\>
-download the .zip file. 
+download the .zip file labeled "OpenRES.zip" (the source files are not in the correct format for use in QGIS). 
 
 -   Open QGIS -\> Plugins -\> Manage and Install
 Plugins... -\> install from ZIP tab --\> select the downloaded zip --\>
