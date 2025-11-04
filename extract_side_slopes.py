@@ -139,6 +139,6 @@ def calculate_side_slopes_from_pairs(center_points_layer,
         center_points_layer.updateFeature(feature)
 
     if center_points_layer.commitChanges():
-        print("✅ LVS and RVS calculated using elevation raster.")
+        print("LVS and RVS calculated using elevation raster.")
     else:
-        print("❌ Failed to commit LVS and RVS.")
+        print("Failed to commit LVS and RVS.")
