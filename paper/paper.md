@@ -1,0 +1,73 @@
+---
+title: 'Open Riverine Ecosystem Synthesis (OpenRES): A QGIS plugin for automated extraction of hydrogeomorphic features to support Functional Process Zone classification of river networks'
+tags:
+  - QGIS
+  - PyQGIS
+  - riverine ecosystem synthesis
+  - functional process zones
+  - hydrogeomorphic
+authors:
+  - name: Jacob Nesslage
+    orcid: 0000-0001-9219-8365
+    affiliation: 1 
+    corresponding: true
+  - name: Erin L. Hestir
+    orcid: 0000-0002-4673-5745
+    affiliation: 1
+
+affiliations:
+ - name: Department of Civil and Environmental Engineering, University of California, Merced, Merced, CA, USA
+   index: 1
+
+date: 04 Nov 2025
+bibliography: paper.bib
+---
+
+# 5.1. Statement of need
+
+Functional Process Zones (FPZs) represent recurring hydrogeomorphic units within river corridors that operate at the reach-to-valley scale. Accurate classification and mapping of these zones are critical for assessing how spatial variations in hydrogeomorphic structure drive differences in ecological communities and ecosystem functioning using the Riverine Ecosystem Synthesis (RES) framework (@thorp_2006). Yet, delineation and classification of FPZs for research and application to riverine ecosystems has been limited by the depreciation of the first generation of standardized spatial analysis tools built for this purpose (e.g., RESonate in ArcMap) (@williams_2013), as well as the lack of alternative open-source tools for extraction of the features needed to classify river networks into FPZs. Still, there remains a need for a degree of standardization across different studies that want to continue to test the hypotheses posed by the RES framework. `OpenRES` fills this gap by providing an open-source, modular, and GUI-accessible solution that integrates seamlessly with QGIS, enabling users to extract the required hydrogeomorphic features for FPZ classification.
+
+# 5.2. Background
+
+Since the publication of the Riverine Ecosystem Synthesis (RES) in 2006, evidence across five continents has emerged that supports the view that hydrogeomorphology is a keystone, physical factor that influences ecological community composition and ecosystem properties across rivers (@thorp_2006, @thorp_2023). In contrast to the prevailing view of rivers as continuous, longitudinal gradients of physiochemical conditions (e.g. the River Continuum Concept, @vannote_1980), the RES poses a conception of rivers as downstream arrays of large, discontinuous, and repeating hydrogeomorphic patches, formed by catchment geomorphology and climate.  Under the RES, these hydrogeomorphic patches or Functional Process Zones (FPZs) are classified at a scale between reaches and valleys (5 km - 10 km) using a minimum set of nine hydrogeomorphic features: elevation, mean annual precipitation, geology class, valley width, valley floor width, valley side slopes, down valley slope, and river sinuosity (@thorp_2010). FPZs characterize the spatial variability in river behavior, describing how each segment of the channel governs flow dynamics, sediment transport, floodplain interactions, and the formation of diverse habitats (@hestir_2007). Given that the RES applies to the entire river network and its watershed, from headwaters to confluence, it is not practical to collect the required data in the field, and so, specialized spatial tools are needed to extract these features across a watershed of interest.  
+
+# 5.3. OpenRES Audience
+
+`OpenRES` is intended for students, instructors, researchers, and practitioners in river science, geomorphology, hydrology, and ecosystem management who use QGIS and need a standardized, open-source tool to delineate FPZs and conduct studies on riverine ecosystems. 
+
+# 5.4. OpenRES Functionality
+
+## 5.4.1. Prior to using OpenRES: Data Preparation
+There are five required datasets needed prior to the extraction of hydrogeomorphic features along a user's watershed of interest using OpenRES in QGIS:
+
+- **Mean annual precipitation** (.geotiff): A rasterized mean annual precipitation layer of the watershed of interest.
+
+- **Digital Elevation Model (DEM) ** (.geotiff): A rasterized digital elevation model of the watershed of interest.
+
+- **Simplified geology** (.shp): A geology polygon layer that contains geologic classification of surficial or underlying geology. Often, this layer is a simplified version of the source geology layer that is classified into bedrock, mixed, or alluvial classes.
+
+- **Geomorphically corrected stream network** (.shp): This is a stream network generated from your DEM, which is then manually corrected to ensure that the stream network follows the course of the river as observed from imagery during the period of interest. 
+
+- **Valley-boundary line layer** (.shp): A line layer delineating both valley-bottom boundaries and the intersecting microsheds or isobasins. Following the general workflow of Williams et al. (2013), this layer is created by (1) delineating the valley bottom, (2) manually editing outputs to remove holes and ensure realistic extents, (3) generating 1–2 km² microsheds or isobasins from the DEM, and (4) applying vector operations (intersection, difference, polygon-to-line) to extract the combined boundaries of the valley floor and confining valley tops.
+
+## 5.4.2. Using OpenRES: Feature Extraction
+The core functionality of `OpenRES` is contained in five data extraction tools, each of which is intended to be used sequentially to automate the extraction of the nine hydrogeomorphic features.
+
+-   **[1] Generate Transects**: The Generate Transects tool projects a perpendicular transect from the center of each user defined stream segment in a river network to the top of the river valley, as defined by the valley line layer. Transect generation is an iterative process where the tool extends a transect by a user defined amount per iteration per side, counts the number of intersections with the valley-boundary line layer, and does not stop generating until at least two intersections are found on both the left and right side of the river network layer. This tool takes as input a river network layer and a line layer that denotes the boundaries of the valley bottom and adjacent valleys, as well as several numerical inputs to define the distance the transects should extend by per iteration and the maximum distance to extend to (to prevent runaway calculations).
+
+-   **[2] Extract ELE, PRE, and GEO**: The Extract Elevation (ELE), Precipitation (PRE), and Geology (GEO) tool uses the river network layer as the spatial reference, the tool samples elevation (ELE) from a user-specified DEM or elevation raster, mean annual precipitation (PRE) from a gridded climate/precipitation raster, and geology class (GEO) from a polygon geology layer or coded raster. Attributes are written back to the river segments center feature class so that each segment has a common set of physical descriptors. 
+
+-   **[3] Extract VW and VFW**: The Extract Valley Width (VW) and Valley Floor Width (VFW) tool uses the previously generated transects to quantify how wide the river valley is at each stream segment. For each transect, the tool identifies the first left and right intersections with the valley-boundary line layer, then measures the distance between those intersections to derive Valley Floor Width (VFW). The second intersections of each side are used to derive Valley Width (VW). 
+
+-   **[4] Extract LVS and RVS**: The Left Valley Slope (LVS) and Right Valley Slope (RVS) tool characterizes valley asymmetry by using the same transect–intersection framework. The tool samples elevation values at the left and right intersection points between the top of the microshed and the valley bottom intersection then computes slope on the left and right sides separately for each transect. 
+
+-   **[5] Extract DVS and SIN**: The Down-Valley Slope (DVS) and Sinuosity (SIN) tool summarizes along-channel controls on energy and planform. DVS is calculated by linking the start and end point of each river segment and computing the longitudinal slope in the downstream direction. SIN (sinuosity) is computed by comparing the actual channel length of a segment to the straight-line distance between its endpoints. 
+
+## 5.4.3. After OpenRES: Unsupervised Classification
+
+Once the user has the nine hydrogeomorphic features provided by OpenRES, they can export the river segments center shapefile containing these values to another software (Python or R) to perform unsupervised hierarchical classification to generate FPZ clusters (see examples in @maasri_2019, @elgueta_2019) . After classifying a river network into FPZs, research questions posed by the tenets of the Riverine Ecosystem Synthesis hypothesis (see @thorp_2023 for full list) can be explored.
+
+# 5.5. Acknowledgements
+`OpenRES` was developed by members of the Earth Observation and Remote Sensing Laboratory at the University of California, Merced. The authors would like to thank Matthew Rossi, Rachel S. Meyer, Natasha Stavros, Madeline Slimp, and Meghan T. Hayden for their feedback, suggestions, and support during the development of OpenRES.
+
+# 5.6. References
