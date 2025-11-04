@@ -136,7 +136,7 @@ class GenerateTransectsAlgorithm(QgsProcessingAlgorithm):
                     left_geom.asPolyline() + right_geom.asPolyline()[1:]
                 )
 
-                t_id = i  # ✅ Assign unique ID
+                t_id = i  # Assign unique ID
 
                 # Create transect feature
                 t_feat = QgsFeature()
@@ -150,14 +150,14 @@ class GenerateTransectsAlgorithm(QgsProcessingAlgorithm):
                 c_feat.setAttributes([t_id])
                 center_sink.addFeature(c_feat, QgsFeatureSink.FastInsert)
 
-                # ✅ Update river feature with t_ID
+                # Update river feature with t_ID
                 if river_vector_layer is not None:
                     river_fid = river_feature.id()
                     field_index = river_vector_layer.fields().indexFromName("t_ID")
                     if field_index != -1:
                         river_vector_layer.changeAttributeValue(river_fid, field_index, t_id)
 
-        # ✅ Commit river layer edits
+        # Commit river layer edits
         if river_vector_layer is not None and river_vector_layer.isEditable():
             river_vector_layer.commitChanges()
 
