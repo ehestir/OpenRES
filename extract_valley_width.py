@@ -254,3 +254,139 @@ def compute_valley_width(center_layer, left_points, right_points, out_field="VW"
 
     return cloned_layer
 
+def find_one_intersection_by_side(transect_layer, other_layer, split_layer,
+                                  tolerance=1e-8, debug=False):
+    """
+    For each transect, find the single nearest intersection point on the left
+    and the single nearest intersection point on the right, using the stream
+    segment with the same 't_ID' to define left/right.
+
+    Parameters
+    ----------
+    transect_layer : QgsVectorLayer
+        Transect lines with 't_ID' field.
+    other_layer : QgsVectorLayer
+        Intersecting lines (e.g. valley/terrace boundaries).
+    split_layer : QgsVectorLayer
+        Stream network with 't_ID' used to get flow direction.
+    tolerance : float
+        Distance threshold to ignore points that coincide with the midpoint.
+    debug : bool
+        Print per-intersection diagnostics.
+
+    Returns
+    -------
+    tuple
+        (left_points, right_points)
+        where each is a list of tuples:
+        left_points  = [(QgsPointXY, t_ID, distance_from_midpoint), ...]
+        right_points = [(QgsPointXY, t_ID, distance_from_midpoint), ...]
+        If a side has no intersection for a transect, that transect just
+        contributes nothing for that side.
+    """
+
+    # Preload features
+    transect_features = list(transect_layer.getFeatures())
+    other_features = list(other_layer.getFeatures())
+    # map t_ID -> stream feature
+    stream_segments = {f['t_ID']: f for f in split_layer.getFeatures()}
+
+    # spatial index for the "other" layer
+    other_index = QgsSpatialIndex(other_layer.getFeatures())
+
+    # outputs
+    left_nearest = []
+    right_nearest = []
+
+    for transect in transect_features:
+        t_id = transect['t_ID']
+        transect_geom = transect.geometry()
+        if transect_geom is None:
+            continue
+
+        # midpoint of transect
+        midpoint = transect_geom.interpolate(transect_geom.length() / 2).asPoint()
+
+        # matching stream segment (to determine direction)
+        stream_segment = stream_segments.get(t_id)
+        if not stream_segment:
+            # can't determine left/right without the stream segment
+            if debug:
+                print(f"t_ID {t_id}: no matching stream segment; skipping")
+            continue
+
+        stream_geom = stream_segment.geometry()
+        if stream_geom is None:
+            continue
+
+        # direction: start -> mid of stream
+        stream_start = stream_geom.vertexAt(0)
+        stream_mid = stream_geom.interpolate(stream_geom.length() / 2).asPoint()
+        direction_vector = QgsPointXY(
+            stream_mid.x() - stream_start.x(),
+            stream_mid.y() - stream_start.y()
+        )
+
+        # candidate "other" features near the transect
+        nearby_ids = other_index.intersects(transect_geom.boundingBox())
+        nearby_feats = [f for f in other_features if f.id() in nearby_ids]
+
+        # temporary holders for this transect
+        left_candidates = []
+        right_candidates = []
+
+        for other in nearby_feats:
+            other_geom = other.geometry()
+            if not other_geom or not transect_geom.intersects(other_geom):
+                continue
+
+            intersection = transect_geom.intersection(other_geom)
+            points = []
+
+            # Collect intersection points robustly
+            if intersection.isMultipart():
+                points.extend(intersection.asMultiPoint())
+            elif intersection.wkbType() == QgsWkbTypes.Point:
+                points.append(intersection.asPoint())
+            elif intersection.wkbType() == QgsWkbTypes.MultiPoint:
+                points.extend(intersection.asMultiPoint())
+            elif intersection.wkbType() == QgsWkbTypes.GeometryCollection:
+                for i in range(intersection.numGeometries()):
+                    g = intersection.geometryN(i)
+                    if g.wkbType() == QgsWkbTypes.Point:
+                        points.append(g.asPoint())
+
+            for pt in points:
+                # skip duplicates / midpoint
+                if pt.distance(QgsPointXY(midpoint)) < tolerance:
+                    continue
+
+                # vector from stream midpoint to the intersection point
+                vec = QgsPointXY(pt.x() - stream_mid.x(), pt.y() - stream_mid.y())
+
+                # cross product to tell side
+                cross = direction_vector.x() * vec.y() - direction_vector.y() * vec.x()
+                side = "left" if cross > 0 else "right"
+
+                dist = midpoint.distance(pt)
+
+                if side == "left":
+                    left_candidates.append((pt, t_id, dist))
+                else:
+                    right_candidates.append((pt, t_id, dist))
+
+                if debug:
+                    print(
+                        f"t_ID {t_id}: side={side}, dist={dist:.3f}, cross={cross:.4f}"
+                    )
+
+        # keep only the *nearest* on each side
+        if left_candidates:
+            left_candidates.sort(key=lambda x: x[2])
+            left_nearest.append(left_candidates[0])
+
+        if right_candidates:
+            right_candidates.sort(key=lambda x: x[2])
+            right_nearest.append(right_candidates[0])
+
+    return left_nearest, right_nearest
