@@ -24,6 +24,7 @@ from .algorithms.extract_vw_algorithm import ExtractVWAlgorithm
 from .algorithms.extract_point_data_algorithm import ExtractPointDataAlgorithm
 from .algorithms.extract_dvs_sin_algorithm import ExtractDVSAlgorithm
 from .algorithms.extract_side_slopes_algorithm import ExtractSideSlopesAlgorithm
+from .algorithms.extract_cbw_algorithm import ExtractCBWAlgorithm
 
 
 #To use log, type OPENRES_DEBUG=1 qgis in bash, then check Log Messages Panel → OpenRES tab for messages
@@ -74,6 +75,7 @@ class OpenRESProvider(QgsProcessingProvider):
         self.addAlgorithm(ExtractPointDataAlgorithm())
         self.addAlgorithm(ExtractDVSAlgorithm())
         self.addAlgorithm(ExtractSideSlopesAlgorithm())
+        self.addAlgorithm(ExtractCBWAlgorithm())
 
     def id(self):
         return "openres"
