@@ -68,7 +68,7 @@ class ExtractVWAlgorithm(QgsProcessingAlgorithm):
         return "extract_valley_width"
 
     def displayName(self):
-        return "[3] Extract VW and VFW"
+        return "[3] Extract VW, VFW, and RAT"
 
     def group(self):
         return "Feature Extraction"
@@ -78,6 +78,38 @@ class ExtractVWAlgorithm(QgsProcessingAlgorithm):
 
     def createInstance(self):
         return ExtractVWAlgorithm()
+
+    def add_ratio_field(self, layer: QgsVectorLayer, feedback: QgsProcessingFeedback):
+            dp = layer.dataProvider()
+
+            # add field if it doesn't exist yet
+            if layer.fields().indexFromName("RAT") == -1:
+                dp.addAttributes([QgsField("RAT", QVariant.Double)])
+                layer.updateFields()
+
+            vw_idx = layer.fields().indexFromName("VW")
+            vfw_idx = layer.fields().indexFromName("VFW")
+            rat_idx = layer.fields().indexFromName("RAT")
+
+            layer.startEditing()
+            count = layer.featureCount()
+
+            for i, f in enumerate(layer.getFeatures()):
+                vw = f[vw_idx]
+                vfw = f[vfw_idx]
+
+                if vfw in (None, 0):
+                    rat_val = None  # or -9999
+                else:
+                    rat_val = float(vw) / float(vfw)
+
+                f[rat_idx] = rat_val
+                layer.updateFeature(f)
+
+                if i % 100 == 0 and count:
+                    feedback.setProgress(int(100 * i / count))
+
+            layer.commitChanges()
 
     def processAlgorithm(self, parameters, context: QgsProcessingContext, feedback: QgsProcessingFeedback):
 
@@ -101,6 +133,7 @@ class ExtractVWAlgorithm(QgsProcessingAlgorithm):
     
             return layer, fields
 
+        
         # Create memory layers
         left_vfw, left_fields = create_output_layer("Left_VFW")
         right_vfw, _ = create_output_layer("Right_VFW")
@@ -129,6 +162,9 @@ class ExtractVWAlgorithm(QgsProcessingAlgorithm):
 
         if center_updated2.isValid():
             center_updated2.setCrs(centers_crs)
+
+        # Ratio of VW:VFW calculation
+        self.add_ratio_field(center_updated2, feedback)
 
         self.save_output_layer(center_updated2, parameters, self.CENTER_OUT, context)
 
