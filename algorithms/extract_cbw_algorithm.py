@@ -35,40 +35,37 @@ from qgis.core import QgsProcessing
 from PyQt5.QtCore import QVariant
 
 from ..extract_valley_width import (
-    find_two_intersections_by_side,
+    find_one_intersection_by_side,
     add_points_in_batch,
     compute_valley_width
 )
 
 
-class ExtractVWAlgorithm(QgsProcessingAlgorithm):
+class ExtractCBWAlgorithm(QgsProcessingAlgorithm):
     TRANSECTS = 'TRANSECTS'
     CENTER_POINTS = 'CENTER_POINTS'
-    VALLEY_LINES = 'VALLEY_LINES'
+    CHANNEL_BELT = 'CHANNEL_BELT'
     STREAM_NETWORK = 'STREAM_NETWORK'
-    LEFT_VFW = 'LEFT_VFW'
-    RIGHT_VFW = 'RIGHT_VFW'
-    LEFT_VW = 'LEFT_VW'
-    RIGHT_VW = 'RIGHT_VW'
+    LEFT_CB = 'LEFT_CB'
+    RIGHT_CB = 'RIGHT_CB'
     CENTER_OUT = 'CENTER_OUT'
 
     def initAlgorithm(self, config=None):
         self.addParameter(QgsProcessingParameterFeatureSource(self.TRANSECTS, "Transects Layer", [QgsProcessing.TypeVectorLine]))
         self.addParameter(QgsProcessingParameterFeatureSource(self.CENTER_POINTS, "Segment Centers Layer", [QgsProcessing.TypeVectorPoint]))
-        self.addParameter(QgsProcessingParameterFeatureSource(self.VALLEY_LINES, "Valley Lines Layer", [QgsProcessing.TypeVectorLine]))
+        self.addParameter(QgsProcessingParameterFeatureSource(self.CHANNEL_BELT, "Channel Belt Layer", [QgsProcessing.TypeVectorLine]))
         self.addParameter(QgsProcessingParameterFeatureSource(self.STREAM_NETWORK, "River Network Layer", [QgsProcessing.TypeVectorLine]))
 
-        self.addParameter(QgsProcessingParameterVectorDestination(self.LEFT_VFW, "Left VFW Reference"))
-        self.addParameter(QgsProcessingParameterVectorDestination(self.RIGHT_VFW, "Right VFW Reference"))
-        self.addParameter(QgsProcessingParameterVectorDestination(self.LEFT_VW, "Left VW Reference"))
-        self.addParameter(QgsProcessingParameterVectorDestination(self.RIGHT_VW, "Right VW Reference"))
-        self.addParameter(QgsProcessingParameterVectorDestination(self.CENTER_OUT, "[3] Segment Centers"))
+
+        self.addParameter(QgsProcessingParameterVectorDestination(self.LEFT_CB, "Left CB Reference"))
+        self.addParameter(QgsProcessingParameterVectorDestination(self.RIGHT_CB, "Right CB Reference"))
+        self.addParameter(QgsProcessingParameterVectorDestination(self.CENTER_OUT, "[6] Segment Centers"))
 
     def name(self):
-        return "extract_valley_width"
+        return "extract_cbw"
 
     def displayName(self):
-        return "[3] Extract VW and VFW"
+        return "[6] Extract CBW"
 
     def group(self):
         return "Feature Extraction"
@@ -77,13 +74,13 @@ class ExtractVWAlgorithm(QgsProcessingAlgorithm):
         return "feature_extraction"
 
     def createInstance(self):
-        return ExtractVWAlgorithm()
+        return ExtractCBWAlgorithm()
 
     def processAlgorithm(self, parameters, context: QgsProcessingContext, feedback: QgsProcessingFeedback):
 
         transects = self.parameterAsVectorLayer(parameters, self.TRANSECTS, context)
         center = self.parameterAsVectorLayer(parameters, self.CENTER_POINTS, context)
-        valley_lines = self.parameterAsVectorLayer(parameters, self.VALLEY_LINES, context)
+        channel_belt = self.parameterAsVectorLayer(parameters, self.CHANNEL_BELT, context)
         stream_network = self.parameterAsVectorLayer(parameters, self.STREAM_NETWORK, context)
 
         centers_crs = center.sourceCrs()
@@ -102,42 +99,37 @@ class ExtractVWAlgorithm(QgsProcessingAlgorithm):
             return layer, fields
 
         # Create memory layers
-        left_vfw, left_fields = create_output_layer("Left_VFW")
-        right_vfw, _ = create_output_layer("Right_VFW")
-        left_vw, _ = create_output_layer("Left_VW")
-        right_vw, _ = create_output_layer("Right_VW")
+        left_cb, left_fields = create_output_layer("Left_CB")
+        right_cb, _ = create_output_layer("Right_CB")
+
 
         # Run intersection logic
-        left1, left2, right1, right2 = find_two_intersections_by_side(transects, valley_lines, stream_network)
+        left1, right1= find_one_intersection_by_side(transects, channel_belt, stream_network)
 
         # Add features to layers
-        add_points_in_batch(left1, left_vfw, "left")
-        add_points_in_batch(right1, right_vfw, "right")
-        add_points_in_batch(left2, left_vw, "left")
-        add_points_in_batch(right2, right_vw, "right")
+        add_points_in_batch(left1, left_cb, "left")
+        add_points_in_batch(right1, right_cb, "right")
+
 
         # Save temporary layers to outputs
-        self.save_output_layer(left_vfw, parameters, self.LEFT_VFW, context)
-        self.save_output_layer(right_vfw, parameters, self.RIGHT_VFW, context)
-        self.save_output_layer(left_vw, parameters, self.LEFT_VW, context)
-        self.save_output_layer(right_vw, parameters, self.RIGHT_VW, context)
+        self.save_output_layer(left_cb, parameters, self.LEFT_CB, context)
+        self.save_output_layer(right_cb, parameters, self.RIGHT_CB, context)
+
         
 
         # Compute valley widths and get updated layer
-        center_updated1 = compute_valley_width(center, left1, right1, out_field="VFW")
-        center_updated2 = compute_valley_width(center_updated1, left2, right2, out_field="VW")
+        center_updated = compute_valley_width(center, left1, right1, out_field="CBW")
 
-        if center_updated2.isValid():
-            center_updated2.setCrs(centers_crs)
 
-        self.save_output_layer(center_updated2, parameters, self.CENTER_OUT, context)
+        if center_updated.isValid():
+            center_updated.setCrs(centers_crs)
+
+        self.save_output_layer(center_updated, parameters, self.CENTER_OUT, context)
 
 
         return {
-            self.LEFT_VFW: parameters[self.LEFT_VFW],
-            self.RIGHT_VFW: parameters[self.RIGHT_VFW],
-            self.LEFT_VW: parameters[self.LEFT_VW],
-            self.RIGHT_VW: parameters[self.RIGHT_VW],
+            self.LEFT_CB: parameters[self.LEFT_CB],
+            self.RIGHT_CB: parameters[self.RIGHT_CB],
             self.CENTER_OUT: parameters[self.CENTER_OUT]
         }
 
