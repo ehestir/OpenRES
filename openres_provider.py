@@ -25,7 +25,7 @@ from .algorithms.extract_point_data_algorithm import ExtractPointDataAlgorithm
 from .algorithms.extract_dvs_sin_algorithm import ExtractDVSAlgorithm
 from .algorithms.extract_side_slopes_algorithm import ExtractSideSlopesAlgorithm
 from .algorithms.extract_cbw_algorithm import ExtractCBWAlgorithm
-#from .algorithms.Sechu_valley_bottom_algorithm import SechuCostDistanceAlgorithm
+from .algorithms.Sechu_valley_bottom_algorithm import SechuCostDistanceAlgorithm
 
 #To use log, type OPENRES_DEBUG=1 qgis in bash, then check Log Messages Panel → OpenRES tab for messages
 
@@ -76,7 +76,7 @@ class OpenRESProvider(QgsProcessingProvider):
         self.addAlgorithm(ExtractDVSAlgorithm())
         self.addAlgorithm(ExtractSideSlopesAlgorithm())
         self.addAlgorithm(ExtractCBWAlgorithm())
-       # self.addAlgorithm(SechuCostDistanceAlgorithm())
+        self.addAlgorithm(SechuCostDistanceAlgorithm())
 
     def id(self):
         return "openres"
