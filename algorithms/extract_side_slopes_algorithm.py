@@ -56,7 +56,7 @@ class ExtractSideSlopesAlgorithm(QgsProcessingAlgorithm):
         return "extract_side_slopes"
 
     def displayName(self):
-        return "[4] Extract LVS and RVS"
+        return "[4] Extract LVS, RVS, and MVS"
 
     def group(self):
         return "Feature Extraction"
@@ -85,7 +85,7 @@ class ExtractSideSlopesAlgorithm(QgsProcessingAlgorithm):
         features = [f for f in center.getFeatures()]
         temp_center_data.addFeatures(features)
 
-        # Run slope calculation and write LSS/RSS
+        # Run slope calculation and write LVS/RVS
         calculate_side_slopes_from_pairs(temp_center, left_vw, left_vfw, right_vw, right_vfw, raster)
 
         # Output to user-defined destination
