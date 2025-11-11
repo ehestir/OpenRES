@@ -55,6 +55,11 @@ def build_pairwise_slope_input(layer_a, layer_b, raster, id_field="t_id"):
     Returns:
         dict: {t_id: {'elev1': float, 'elev2': float, 'dist': float}}
     """
+    # Obtain NoData from raster (for check later in script) - ref: Issue #24
+    provider = raster.dataProvider()
+    band = 1
+    nodata = provider.sourceNoDataValue(band)
+    
     dict_a = {f[id_field]: f for f in layer_a.getFeatures()}
     dict_b = {f[id_field]: f for f in layer_b.getFeatures()}
 
@@ -64,19 +69,26 @@ def build_pairwise_slope_input(layer_a, layer_b, raster, id_field="t_id"):
         if t_id not in dict_b:
             continue
 
-        feat1 = dict_a[t_id]
-        feat2 = dict_b[t_id]
-        pt1 = feat1.geometry().asPoint()
-        pt2 = feat2.geometry().asPoint()
+        feat1 = dict_a[t_id] #VW Ref
+        feat2 = dict_b[t_id] # VFW Ref
+        pt1 = feat1.geometry().asPoint() #VW geometry
+        pt2 = feat2.geometry().asPoint() #VFW geometry
 
+        # Extract elevation
         elev1 = get_elevation_at_point(pt1, raster)
         elev2 = get_elevation_at_point(pt2, raster)
 
+        # None/NoData check - ref: Issue #24
         if elev1 is None or elev2 is None:
+            continue
+        if (nodata is not None and (abs(elev1 - nodata) < 1e-6 or abs(elev2 - nodata) < 1e-6)):
             continue
 
         dist = math.hypot(pt2.x() - pt1.x(), pt2.y() - pt1.y())
+        if dist == 0:
+            continue
 
+        # Add to slope_data dict for subsequent processing
         slope_data[t_id] = {
             "elev1": elev1,
             "elev2": elev2,
@@ -92,7 +104,7 @@ def calculate_side_slopes_from_pairs(center_points_layer,
                                      elevation_raster,
                                      id_field="t_id"):
     """
-    Calculates LSS and RSS using paired intersection points and elevation sampled from raster.
+    Calculates LVS and RVS using paired intersection points and elevation sampled from raster.
 
     Parameters:
         center_points_layer (QgsVectorLayer): Centerline points where LVS and RVS will be written.
@@ -103,8 +115,8 @@ def calculate_side_slopes_from_pairs(center_points_layer,
         elevation_raster (QgsRasterLayer): Elevation raster.
         id_field (str): Field to join all layers (e.g., 't_id').
     """
-    # Add LSS and RSS fields if missing
-    for field_name in ["LVS", "RVS"]:
+    # Add LVS, RVS, and MVS fields if missing
+    for field_name in ["LVS", "RVS", "MVS"]:
         if center_points_layer.fields().indexFromName(field_name) == -1:
             center_points_layer.dataProvider().addAttributes([QgsField(field_name, QVariant.Double)])
     center_points_layer.updateFields()
@@ -118,27 +130,35 @@ def calculate_side_slopes_from_pairs(center_points_layer,
     for feature in center_points_layer.getFeatures():
         t_id = feature[id_field]
 
-        # Left Side Slope
+        # Left Valley Slope (LVS)
         if t_id in left_slopes:
             l = left_slopes[t_id]
             elev_diff = abs(l["elev1"] - l["elev2"])
-            slope = (elev_diff / l["dist"]) * 100 if l["dist"] > 0 else None
-            feature["LVS"] = slope
+            LVS = (elev_diff / l["dist"]) * 100 if l["dist"] > 0 else None
+            feature["LVS"] = LVS
         else:
+            LVS = None
             feature["LVS"] = None
 
-        # Right Side Slope
+        # Right Valley Slope (RVS)
         if t_id in right_slopes:
             r = right_slopes[t_id]
             elev_diff = abs(r["elev1"] - r["elev2"])
-            slope = (elev_diff / r["dist"]) * 100 if r["dist"] > 0 else None
-            feature["RVS"] = slope
+            RVS = (elev_diff / r["dist"]) * 100 if r["dist"] > 0 else None
+            feature["RVS"] = RVS
         else:
+            RVS = None
             feature["RVS"] = None
 
+        # Check for missing values and compute Mean Valley Slope (MVS) only if both exist
+        if LVS is not None and RVS is not None:
+            mean_slope = (LVS + RVS) / 2.0
+            feature["MVS"]= mean_slope
+        else:
+            mean_slope = None
         center_points_layer.updateFeature(feature)
 
     if center_points_layer.commitChanges():
-        print("LVS and RVS calculated using elevation raster.")
+        print("LVS, RVS, and MVS calculated using elevation raster.")
     else:
-        print("Failed to commit LVS and RVS.")
+        print("Failed to commit LVS, RVS, and MVS.")
