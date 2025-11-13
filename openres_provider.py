@@ -19,13 +19,18 @@ from qgis.core import QgsProcessingProvider,QgsMessageLog,Qgis
 import os
 from qgis.PyQt.QtGui import QIcon
 
+# Feature Extraction Tools
 from .algorithms.generate_transects_algorithm import GenerateTransectsAlgorithm
 from .algorithms.extract_vw_algorithm import ExtractVWAlgorithm
 from .algorithms.extract_point_data_algorithm import ExtractPointDataAlgorithm
 from .algorithms.extract_dvs_sin_algorithm import ExtractDVSAlgorithm
 from .algorithms.extract_side_slopes_algorithm import ExtractSideSlopesAlgorithm
 from .algorithms.extract_cbw_algorithm import ExtractCBWAlgorithm
+#from .algorithms.extract_cbs_algorithm import ExtractCBSAlgorithm
+
+# Geomorphology Tools
 from .algorithms.Sechu_valley_bottom_algorithm import SechuCostDistanceAlgorithm
+from .algorithms.generate_channel_belt_algorithm import GenerateChannelBeltAlgorithm
 
 #To use log, type OPENRES_DEBUG=1 qgis in bash, then check Log Messages Panel → OpenRES tab for messages
 
@@ -70,13 +75,17 @@ class OpenRESProvider(QgsProcessingProvider):
 
 
     def loadAlgorithms(self):
+        # Feature Extraction Tools
         self.addAlgorithm(GenerateTransectsAlgorithm())
         self.addAlgorithm(ExtractVWAlgorithm())
         self.addAlgorithm(ExtractPointDataAlgorithm())
         self.addAlgorithm(ExtractDVSAlgorithm())
         self.addAlgorithm(ExtractSideSlopesAlgorithm())
         self.addAlgorithm(ExtractCBWAlgorithm())
+       # self.addAlgorithm(ExtractCBSAlgorithm())
+        # Geomorphology Tools
         self.addAlgorithm(SechuCostDistanceAlgorithm())
+        self.addAlgorithm(GenerateChannelBeltAlgorithm())
 
     def id(self):
         return "openres"
