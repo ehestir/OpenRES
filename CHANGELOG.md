@@ -6,6 +6,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com),
 and this project adheres to [Semantic Versioning](https://semver.org).
 
 ---
+## [1.1.0] - 2025-11-12
+
 ## [1.0.1] - 2025-10-09
 ### Added
 - CRS information for Extract VW and VFW now appends to outputs - ref: Issue #21 by @jollygoodjacob in https://github.com/jollygoodjacob/OpenRES/pull/22

@@ -2,7 +2,7 @@
 
 ## A [QGIS](https://qgis.org/en/site/index.html) plugin for automated extraction of hydrogeomorphic features to support functional process zone classification of river networks
 
-[![Open Source Love svg1](https://badges.frapsoft.com/os/v1/open-source.svg?v=103)](https://github.com/ellerbrock/open-source-badges/) [![made-with-python](https://img.shields.io/badge/Made%20with-Python-ffd040.svg)](https://www.python.org/) [![License: GPL v3](https://img.shields.io/badge/License-GPL%20v3-blue.svg)](https://www.gnu.org/licenses/old-licenses/gpl-3.0.html) [![DOI](https://zenodo.org/badge/1029300298.svg)](https://doi.org/10.5281/zenodo.17196890) [![GitHub release](https://img.shields.io/github/v/release/jollygoodjacob/OpenRES)](https://github.com/jollygoodjacob/OpenRES/releases) [![GitHub commits](https://img.shields.io/github/commits-since/jollygoodjacob/OpenRES/v1.0.0)](https://github.com/jollygoodjacob/OpenRES/commits) [![Maintenance](https://img.shields.io/badge/Maintained%3F-yes-green.svg)](https://GitHub.com/jollygoodjacob/OpenRES/graphs/commit-activity)
+[![Open Source Love svg1](https://badges.frapsoft.com/os/v1/open-source.svg?v=103)](https://github.com/ellerbrock/open-source-badges/) [![made-with-python](https://img.shields.io/badge/Made%20with-Python-ffd040.svg)](https://www.python.org/) [![License: GPL v3](https://img.shields.io/badge/License-GPL%20v3-blue.svg)](%5Bhttps://www.gnu.org/licenses/old-licenses/gpl-3.0.html%5D(https://www.gnu.org/licenses/gpl-3.0.html#license-text)) [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.17307006.svg)](https://doi.org/10.5281/zenodo.17307006) [![OpenRES](https://img.shields.io/badge/QGIS%20Repo-OpenRES-589632)](https://plugins.qgis.org/plugins/OpenRES) [![GitHub release](https://img.shields.io/github/v/release/jollygoodjacob/OpenRES)](https://github.com/jollygoodjacob/OpenRES/releases) [![GitHub commits](https://img.shields.io/github/commits-since/jollygoodjacob/OpenRES/v1.0.1)](https://github.com/jollygoodjacob/OpenRES/commits) [![Maintenance](https://img.shields.io/badge/Maintained%3F-yes-green.svg)](https://GitHub.com/jollygoodjacob/OpenRES/graphs/commit-activity)
 
 ## Citation
 
@@ -39,19 +39,21 @@ If you use this plugin in your work, please cite it as:
 
 There are six required datasets needed prior to the extraction of hydrogeomorphic features along a user's watershed of interest using **OpenRES** in QGIS:
 
-- **Mean annual precipitation** (.geotiff): A rasterized mean annual precipitation layer of the watershed of interest.
+-   **Mean annual precipitation** (.geotiff): A rasterized mean annual precipitation layer of the watershed of interest.
 
-- **Digital Elevation Model (DEM) ** (.geotiff): A rasterized digital elevation model of the watershed of interest.
+-   **Digital Elevation Model (DEM)** (.geotiff): A rasterized digital elevation model of the watershed of interest.
 
-- **Simplified geology** (.shp): A geology polygon layer that contains geologic classification of surficial or underlying geology. Often, this layer is a simplified version of the source geology layer that is classified into bedrock, mixed, or alluvial classes.
+-   **Simplified geology** (.shp): A geology polygon layer that contains geologic classification of surficial or underlying geology. Often, this layer is a simplified version of the source geology layer that is classified into bedrock, mixed, or alluvial classes.
 
-- **Geomorphically corrected stream network** (.shp): This is a stream network generated from your DEM, which is then manually corrected to ensure that the stream network follows the course of the river as observed from imagery during the period of interest. 
+-   **Geomorphically corrected stream network** (.shp): This is a stream network generated from your DEM, which is then manually corrected to ensure that the stream network follows the course of the river as observed from imagery during the period of interest.
 
-- **Valley-boundary line layer** (.shp): A line layer delineating both valley-bottom boundaries and the intersecting microsheds or isobasins. This layer is created by (1) delineating the valley bottom using `OpenRES` geomorphology tools or some other method, (2) manually editing outputs to remove holes and ensure realistic extents, (3) generating 1–2 km² microsheds or isobasins from the DEM, and (4) applying vector operations (intersection, difference, polygon-to-line) to extract the combined boundaries of the valley floor and confining valley tops as a line layer.
+-   **Valley-boundary line layer** (.shp): A line layer delineating both valley-bottom boundaries and the intersecting microsheds or isobasins. This layer is created by (1) delineating the valley bottom using `OpenRES` geomorphology tools or some other method, (2) manually editing outputs to remove holes and ensure realistic extents, (3) generating 1--2 km² microsheds or isobasins from the DEM, and (4) applying vector operations (intersection, difference, polygon-to-line) to extract the combined boundaries of the valley floor and confining valley tops as a line layer.
 
-- **Channel Belt** (.shp): A line layer delineating the channel belt, defined as the portion of the valley floor occupied or recently influenced by river channel movement, including the active channel and associated depositional features. This layer can be created by (1) creating offset lines called "LeftChannelBelt" and "RIghtChannelBelt" from your stream network after usering [1] Generate Transects (to ensure lines have t_ID), defined by an appropriate width for your river system, (2) merging those lines into a line layer called "ChannelBelt", and (3) manually edit the channel belt such that it contains the edges of the river meanders and observable depositional features.
+-   **Channel Belt** (.shp): A line layer delineating the channel belt, defined as the portion of the valley floor occupied or recently influenced by river channel movement, including the active channel and associated depositional features. This layer can be created by (1) creating offset lines called "LeftChannelBelt" and "RIghtChannelBelt" from your stream network after using [1] Generate Transects (to ensure lines have t_ID), offset by an appropriate width for your river system, (2) merging those lines into a line layer called "ChannelBelt", and (3) manually edit the channel belt such that it contains the edges of the river meanders and observable depositional features.
 
 ## Core Functionality
+
+### Feature Extraction Tools
 
 As of this version of the plugin, the core functionality of OpenRES provides up to 12 features that can be used to delineate FPZs from river networks:
 
@@ -63,12 +65,14 @@ As of this version of the plugin, the core functionality of OpenRES provides up 
 -   **Ratio of valley width and valley floor width (RAT)**: The ratio between valley width and valley floor width.
 -   **Right Valley Slope (RVS)**: Slope (in %) between the first and second intersection of a transect with the valley line layer on the right side of the river, as defined from a downstream direction. This essentially is the slope between the tops of the valley and the valley bottom on the right side of the river.
 -   **Left Valley Slope (LVS)**: Slope (in %) between the first and second intersection of a transect with the valley line layer on the left side of the river, as defined looking downstream. This essentially is the slope between the tops of the valley and the valley bottom on the left side of the river.
+-   **Mean Valley Slope (MVS)**: The average lateral valley slope as calculated between the LVS and RVS.
 -   **Down Valley Slope (DVS)**: The slope (in %) between the starting point and endpoint of a given stream segment.
 -   **River Sinuosity (SIN)**: The ratio of the true stream distance and the straight line distance between the starting point and endpoint of a given stream segment.
+-   **Channel Belt Width (CBW)**: Width (in meters) of the channel belt, as measured by the intersecting transect.
 
 These twelve features can then be used to classify stream networks using unsupervised hierarchical classification methods (see examples in [Thorp et al. 2010](https://books.google.com/books?hl=en&lr=&id=9N9rz8YH_u0C&oi=fnd&pg=PP1&dq=thorp+et+al+2010&ots=eBk_vZsNWA&sig=1XQ2cIyXRnD_t4t1MOtwe6xpQDQ#v=onepage&q=thorp%20et%20al%202010&f=false), [Elgueta et al. 2019](https://onlinelibrary.wiley.com/doi/full/10.1002/rra.3557), [Maasri et al. 2021](https://onlinelibrary.wiley.com/doi/full/10.1002/rra.3784)). The classes obtained using these methods define stream segments that share similar physical, hydrological, and geomorphic characteristics.
 
-Future versions of **OpenRES** will likely extend the number of features to include optional features, such as the ratio of valley width to valley floor width (RAT), channel belt sinuosity (CBD), the valley confinement index (VCI), and other miscellaneous tools to aid users in producing the required datasets.
+### Geomorphology Tools
 
 ## Installation
 
@@ -127,6 +131,7 @@ The following table summarizes the nine geomorphic and environmental features th
 | 5    | Down-Valley Slope           | `DVS`          |
 | 5    | Sinuosity                   | `SIN`          |
 | 6    | Channel Belt Width          | `CBW`          |
+
 ------------------------------------------------------------------------
 
 ### Step 1: Generate Transects
