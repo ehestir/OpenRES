@@ -33,57 +33,11 @@ If you use this plugin in your work, please cite it as:
 
 **OpenRES** enables QGIS users to extract up to fifteen physical and environmental features along river segments (typically 5--10 km) to support classification of river networks into **Functional Process Zones (FPZs)**.
 
-**Functional Process Zone (FPZ)** classification is a method used to divide a river network into river valley scale (5-10 km) segments (or "zones") that share similar physical, hydrological, and geomorphic characteristics. Rather than treating a river as a continuous longitudinal gradient of changing physical conditions, FPZ classification recognizes that rivers are composed of a discontinuous set of hydrogeomorphic patches, each shaped by different landscape and hydrologic processes ([Hestir 2007](https://www.researchgate.net/profile/Erin-Hestir/publication/265026989_Functional_Process_Zones_and_the_River_Continuum_Concept/links/546248c00cf2c0c6aec1ade8/Functional-Process-Zones-and-the-River-Continuum-Concept.pdf)). These zones reflect how the river behaves in a given segment, including how it flows, how it transports sediment, how it interacts with its floodplain, and what types of habitats it supports. After classifying a river network in FPZs, research questions posed by the tenets of the Riverine Ecosystem Synthesis hypothesis ([Thorp et al. 2006](https://onlinelibrary.wiley.com/doi/abs/10.1002/rra.901), [Thorp et al. 2023](https://www.frontiersin.org/journals/ecology-and-evolution/articles/10.3389/fevo.2023.1184433/full)) can be explored.
+**Functional Process Zone (FPZ)** classification is a method used to divide a river network into river valley scale (5-10 km) segments (or "zones") that share similar physical, hydrological, and geomorphic characteristics. Rather than treating a river as a continuous longitudinal gradient of changing physical conditions, FPZ classification recognizes that rivers are composed of a discontinuous set of hydrogeomorphic patches, each shaped by different landscape and hydrologic processes ([Hestir 2007](https://www.researchgate.net/profile/Erin-Hestir/publication/265026989_Functional_Process_Zones_and_the_River_Continuum_Concept/links/546248c00cf2c0c6aec1ade8/Functional-Process-Zones-and-the-River-Continuum-Concept.pdf)). These zones reflect how the river behaves in a given segment, including how it flows, how it transports sediment, how it interacts with its floodplain, and what types of habitats it supports.
 
-## Data Prerequisites
+After classifying a river network in FPZs, research questions posed by the tenets of the Riverine Ecosystem Synthesis hypothesis ([Thorp et al. 2006](https://onlinelibrary.wiley.com/doi/abs/10.1002/rra.901), [Thorp et al. 2023](https://www.frontiersin.org/journals/ecology-and-evolution/articles/10.3389/fevo.2023.1184433/full)) can be explored.
 
-There are six required datasets needed prior to the extraction of hydrogeomorphic features along a user's watershed of interest using **OpenRES** in QGIS:
-
--   **Mean annual precipitation** (.geotiff): A rasterized mean annual precipitation layer of the watershed of interest.
-
--   **Digital Elevation Model (DEM)** (.geotiff): A rasterized digital elevation model of the watershed of interest.
-
--   **Simplified geology** (.shp): A geology polygon layer that contains geologic classification of surficial or underlying geology. Often, this layer is a simplified version of the source geology layer that is classified into bedrock, mixed, or alluvial classes.
-
--   **Geomorphically corrected stream network** (.shp): This is a stream network generated from your DEM, which is then manually corrected to ensure that the stream network follows the course of the river as observed from imagery during the period of interest.
-
--   **Valley-boundary line layer** (.shp): A line layer delineating both valley-bottom boundaries and the intersecting microsheds or isobasins. This layer is created by (1) delineating the valley bottom using `OpenRES` geomorphology tools or some other method, (2) manually editing outputs to remove holes and ensure realistic extents, (3) generating 1--2 km² microsheds or isobasins from the DEM, and (4) applying vector operations (intersection, difference, polygon-to-line) to extract the combined boundaries of the valley floor and confining valley tops as a line layer.
-
--   **Channel Belt** (.shp): A line layer delineating the channel belt, defined as the portion of the valley floor occupied or recently influenced by river channel movement, including the active channel and associated depositional features. This layer can be created by (1) using the `Generate Channel Belt` tool provided by `OpenRES` to create offset lines from your stream network at a specified width, and (2) manually edit the channel belt such that it contains the edges of the river meanders and observable depositional features.
-
-## Core Functionality
-
-### Geomorphology Tools
-
-To aid in producing the **valley-boundary line layer** and the **channel belt layer**, OpenRES provides several geomorphology utilities that can be used prior to data extraction.
-
--   **Generate Channel Belt**: This tool creates left and right offset lines from the user's stream network by a user-defined distance, representing the lateral extent of the active or recently active channel zone. These offsets are merged into a single line layer, which should be manually refined by the user to match visible channel-belt boundaries. The output forms the basis for subsequent extraction of channel belt width and sinuosity.
-
--   **Valley Floor Delineation - Sechu**: This tool implements a modified cost-accumulation approach to identify the valley floor from a DEM (based on methods described by [Sechu et al. 2021](https://www.mdpi.com/2073-4441/13/6/827)). The algorithm propagates elevation cost outward from the channel until a threshold in slope is reached, effectively distinguishing low-relief floodplain areas from confining valley walls. The resulting polygon can be used as a starting point to produce the valley-floor boundaries needed for later transect intersection analyses.
-
-### Feature Extraction Tools
-
-As of this version of the plugin, the core functionality of OpenRES provides up to 15 features that can be used to delineate FPZs from river networks:
-
--   **Elevation (ELE)**: Elevation value (often in meters), extracted from the center of each stream segment.
--   **Mean Annual Precipitation (PRE)**: Mean annual precipitation value (often in mm), extracted from the center of each stream segment.
--   **Geology (GEO)**: Geology field value, extracted from the center of each stream segment.
--   **Valley Floor Width (VFW)**: Width (in meters) between the first intersections of the transects for each stream segment on the left and right sides of the stream and the valley line layer. When correctly generated, the first intersection of the valley line layer should correspond with the boundaries of the valley floor.
--   **Valley Width (VW)**: Width (in meters) between the second intersections of the transects for each stream segment on the left and right sides of the stream and the valley line layer. When correctly generated, the second intersection of the valley line layer should correspond with tops of hydrologically connected basins that intersect the valley floor, which approximates the tops of valleys.
--   **Ratio of valley width and valley floor width (RAT)**: The ratio between valley width and valley floor width. An indicator of whether a valley is confined/V-shaped or unconfined/U-shaped.
--   **Right Valley Slope (RVS)**: Slope (in %) between the first and second intersection of a transect with the valley line layer on the right side of the river, as defined from a downstream direction. This essentially is the slope between the tops of the valley and the valley bottom on the right side of the river.
--   **Left Valley Slope (LVS)**: Slope (in %) between the first and second intersection of a transect with the valley line layer on the left side of the river, as defined looking downstream. This essentially is the slope between the tops of the valley and the valley bottom on the left side of the river.
--   **Mean Valley Slope (MVS)**: The average lateral valley slope as calculated between the LVS and RVS. An indicator of whether a valley is confined/V-shaped or unconfined/U-shaped.
--   **Down Valley Slope (DVS)**: The slope (in %) between the starting point and endpoint of a given stream segment. An indicator of the stream's gradient/power.
--   **River Sinuosity (SIN)**: The ratio of the true stream distance and the straight line distance between the starting point and endpoint of a given stream segment.
--   **Channel Belt Width (CBW)**: Width (in meters) of the channel belt, as measured by the intersecting transect.
--   **Left Channel Sinuosity (LCS)**: The ratio of the true channel belt distance and the straight line distance between the starting point and endpoint of a given channel belt segment, measured from the left side.
--   **Right Channel Sinuosity (RCS)**: The ratio of the true channel belt distance and the straight line distance between the starting point and endpoint of a given channel belt segment, measured from the right side.
--   **Channel Belt Sinuosity (CBS)**: Average channel belt sinuosity between LCS and RCS, which should approximate the channel belt sinuosity of the river.
-
-These fifteen features (or a subset thereof) can then be used to classify stream networks using unsupervised hierarchical classification methods (see examples in [Thorp et al. 2010](https://books.google.com/books?hl=en&lr=&id=9N9rz8YH_u0C&oi=fnd&pg=PP1&dq=thorp+et+al+2010&ots=eBk_vZsNWA&sig=1XQ2cIyXRnD_t4t1MOtwe6xpQDQ#v=onepage&q=thorp%20et%20al%202010&f=false), [Elgueta et al. 2019](https://onlinelibrary.wiley.com/doi/full/10.1002/rra.3557), [Maasri et al. 2021](https://onlinelibrary.wiley.com/doi/full/10.1002/rra.3784)). The classes obtained using these methods define stream segments that share similar physical, hydrological, and geomorphic characteristics.
-
-### Geomorphology Tools
+------------------------------------------------------------------------
 
 ## Installation
 
@@ -94,6 +48,57 @@ These fifteen features (or a subset thereof) can then be used to classify stream
 -   Go to releases of this repository -\> select desired version -\> download the .zip file.
 
 -   Open QGIS -\> Plugins -\> Manage and Install Plugins... -\> install from ZIP tab --\> select the downloaded zip --\> install plugin (ignore warnings, if any).
+
+------------------------------------------------------------------------
+
+## Data Prerequisites
+
+Users should prepare the following **six datasets** for your watershed of interest. Use consistent CRS and units (projected meters recommended, e.g., UTM) for all layers.
+
+| Dataset                                           | Format | Description                                                                                                                                                                                                                                                                                                                                                                   |
+|---------------------------|-------------------|---------------------------|
+| **Mean Annual Precipitation Layer**               | `.tif` | Raster of mean annual precipitation for the watershed.                                                                                                                                                                                                                                                                                                                        |
+| **Digital Elevation Model (DEM) Layer**           | `.tif` | Elevation raster used for slopes, valley floors, and longitudinal gradients.                                                                                                                                                                                                                                                                                                  |
+| **Simplified Geology Layer**                      | `.shp` | Polygon layer with generalized classes (e.g., alluvial, mixed, bedrock). Typically a simplified version of a detailed map.                                                                                                                                                                                                                                                    |
+| **Geomorphically Corrected Stream Network Layer** | `.shp` | Stream lines generated from the DEM and manually corrected to follow observed channel positions in imagery for the analysis period (Whitebox Workflows recommended here).                                                                                                                                                                                                     |
+| **Valley-Boundary Line Layer**                    | `.shp` | Lines delineating both the valley floor boundary and valley-edge boundary. Suggested workflow: (1) delineate valley floor, (2) edit to remove holes and unrealistic extents, (3) derive 1--2 km² microsheds/isobasins from the DEM (Whitebox Workflows recommended here), (4) apply intersection/difference/polygon-to-line to extract combined boundaries as a line feature. |
+| **Channel Belt Layer**                            | `.shp` | Lines delineating the channel belt (active/recent fluvial influence, including channel and depositional features). Suggested workflow: (1) OpenRES → Generate Channel Belt, (2) manual refinement to match meanders and depositional forms visible in imagery.                                                                                                                |
+
+Some of these layers may not be very common for most river systems (especially the **Valley-Boundary Line Layer** and **Channel Belt Layer**). For these less common datasets, `OpenRES` provides several geomorphology utility tools to allow users to create these datasets for their watershed of interest.
+
+**Data quality tips** - Ensure all inputs share the same projected CRS and unit (meters). - Snap and clean linework to avoid sliver gaps that can break intersections.
+
+------------------------------------------------------------------------
+
+## Core Functionality
+
+**OpenRES** provides geomorphology utilities to prepare key boundary layers and a set of sequential extraction tools that produce a standard suite of **15 hydrogeomorphic attributes** for FPZ classification.
+
+### Geomorphology Tools
+
+Use these tools to produce your **Valley-Boundary Line Layer** and **Channel Belt** .
+
+**Generate Channel Belt** Creates left/right offsets from the stream network to approximate the active or recently active channel zone, merges offsets, and produces a single line layer. Users should refine the result to match visible channel-belt edges. Outputs are used later for Channel Belt Width (CBW) and Channel Belt Sinuosity (CBS).
+
+**Valley Floor Delineation --- Sechu** Implements a modified cost-accumulation approach to delineate valley floors from a DEM (Sechu et al., 2021). The method propagates outward from the channel until a slope threshold is reached, separating low-relief valley bottoms from confining walls. The polygon output can be edited and converted to the linework needed for valley-boundary intersections.
+
+------------------------------------------------------------------------
+
+### Data Extraction Tools
+
+Run these tools in order. Together, they generate all attributes required for FPZ classification.
+
+| Step                          | What it does                                                                                                                                                                                          | Key outputs                        |
+|-------------------|----------------------------|-------------------------|
+| **[1] Generate Transects**    | Creates perpendicular transects from each stream segment to the valley edges. Iteratively extends per side until two intersections per side are found, ensuring complete valley cross-sections.       | `t_ID`, transects, segment centers |
+| **[2] Extract ELE, PRE, GEO** | Samples elevation (DEM), precipitation (climate raster), and geology (polygon) at segment centers to capture environmental gradients.                                                                 | `ELE`, `PRE`, `GEO`                |
+| **[3] Extract VW, VFW, RAT**  | Measures **Valley Floor Width (VFW)** and **Valley Width (VW)** using first and second intersections of transects with valley boundaries. Computes **RAT = VW / VFW** to quantify valley confinement. | `VFW`, `VW`, `RAT`                 |
+| **[4] Extract LVS, RVS, MVS** | Calculates **Left (LVS)** and **Right (RVS)** valley slopes from elevation differences between valley tops and floors; averages them to obtain **Mean Valley Slope (MVS)**.                           | `LVS`, `RVS`, `MVS`                |
+| **[5] Extract DVS and SIN**   | Derives **Down-Valley Slope (DVS)** from start and end elevations of each stream segment and computes **River Sinuosity (SIN)** as the ratio of true channel length to straight-line distance.        | `DVS`, `SIN`                       |
+| **[6] Extract CBW**           | Measures **Channel Belt Width (CBW)** as the distance between first left and right transect intersections with the channel belt line layer.                                                           | `CBW`                              |
+| **[7] Extract LCS, RCS, CBS** | Calculates **Left (LCS)** and **Right (RCS)** Channel Sinuosity within the channel belt; averages both to derive **Channel Belt Sinuosity (CBS)**.                                                    | `LCS`, `RCS`, `CBS`                |
+
+------------------------------------------------------------------------
 
 ## Example usage: Eerste River catchment, South Africa
 
@@ -128,20 +133,22 @@ Before starting the OpenRES workflow:
 
 The following table summarizes the nine geomorphic and environmental features that will be automatically derived across the Eerste River catchment using the OpenRES tool suite. Each transect, generated perpendicular to the stream network, will be assigned a unique identifier `t_ID`, and the attributes listed below will be extracted or calculated at the transect or segment level. Transects, segment centers, and the river network segments are all linked together by the `t_ID` field, enabling subsequent FPZ classification methods to link using joins and relates to the stream network, river segment centers, or transects as desired for visualization purposes.
 
-| Step | Feature                     | Attribute Code |
-|------|-----------------------------|----------------|
-| 1    | Transects & segment centers | `t_ID`         |
-| 2    | Elevation                   | `ELE`          |
-| 2    | Precipitation               | `PRE`          |
-| 2    | Geology class               | `GEO`          |
-| 3    | Valley Floor Width          | `VFW`          |
-| 3    | Valley Width                | `VW`           |
-| 3    | Ratio of VW and VFW         | `RAT`          |
-| 4    | Left/Right Valley Slope     | `LVS`, `RVS`   |
-| 4    | Mean Valley Slope           | `MVS`          |
-| 5    | Down-Valley Slope           | `DVS`          |
-| 5    | Sinuosity                   | `SIN`          |
-| 6    | Channel Belt Width          | `CBW`          |
+| Step | Feature                      | Attribute Code |
+|------|------------------------------|----------------|
+| 1    | Transects & segment centers  | `t_ID`         |
+| 2    | Elevation                    | `ELE`          |
+| 2    | Precipitation                | `PRE`          |
+| 2    | Geology class                | `GEO`          |
+| 3    | Valley Floor Width           | `VFW`          |
+| 3    | Valley Width                 | `VW`           |
+| 3    | Ratio of VW and VFW          | `RAT`          |
+| 4    | Left/Right Valley Slope      | `LVS`, `RVS`   |
+| 4    | Mean Valley Slope            | `MVS`          |
+| 5    | Down-Valley Slope            | `DVS`          |
+| 5    | Sinuosity                    | `SIN`          |
+| 6    | Channel Belt Width           | `CBW`          |
+| 7    | Left/Right Channel Sinuosity | `LCS`, `RCS`   |
+| 7    | Channel Belt Sinuosity       | `CBS`          |
 
 ------------------------------------------------------------------------
 
