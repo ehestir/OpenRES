@@ -10,7 +10,7 @@
 
 
 
-<meta name="date" content="2025-11-04" />
+<meta name="date" content="2025-11-13" />
 
 <title>Open Riverine Ecosystem Synthesis (OpenRES): A QGIS plugin for automated extraction of hydrogeomorphic features to support Functional Process Zone classification of river networks</title>
 
@@ -375,60 +375,62 @@ display: none;
 (OpenRES): A QGIS plugin for automated extraction of hydrogeomorphic
 features to support Functional Process Zone classification of river
 networks</h1>
-<h4 class="date">04 Nov 2025</h4>
+<h4 class="date">13 Nov 2025</h4>
 
 </div>
 
 
 <div id="statement-of-need" class="section level1">
-<h1>5.1. Statement of need</h1>
+<h1>Statement of need</h1>
 <p>Functional Process Zones (FPZs) represent recurring hydrogeomorphic
 units within river corridors that operate at the reach-to-valley scale.
-Accurate classification and mapping of these zones are critical for
-assessing how spatial variations in hydrogeomorphic structure drive
-differences in ecological communities and ecosystem functioning using
-the Riverine Ecosystem Synthesis (RES) framework (<span class="citation">Thorp, Thoms, and Delong (2006)</span>). Yet,
-delineation and classification of FPZs for research and application to
-riverine ecosystems has been limited by the depreciation of the first
-generation of standardized spatial analysis tools built for this purpose
-(e.g., RESonate in ArcMap) (<span class="citation">Williams et al.
-(2013)</span>), as well as the lack of alternative open-source tools for
-extraction of the features needed to classify river networks into FPZs.
-Still, there remains a need for a degree of standardization across
-different studies that want to continue to test the hypotheses posed by
-the RES framework. <code>OpenRES</code> fills this gap by providing an
-open-source, modular, and GUI-accessible solution that integrates
-seamlessly with QGIS, enabling users to extract the required
-hydrogeomorphic features for FPZ classification.</p>
+Accurate classification and mapping of these zones are essential for
+evaluating how spatial variations in hydrogeomorphic structure influence
+ecological communities and ecosystem functioning within the Riverine
+Ecosystem Synthesis (RES) framework (<span class="citation">Thorp,
+Thoms, and Delong (2006)</span>). However, the delineation and
+classification of FPZs have been constrained by the deprecation of
+earlier standardized spatial analysis tools (e.g., RESonate for ArcMap;
+<span class="citation">Williams et al. (2013)</span>) and by the absence
+of open-source alternatives capable of extracting the diverse
+hydrogeomorphic features required for FPZ classification across entire
+river networks. This limitation has hindered reproducibility and
+comparability across studies seeking to test or extend the RES
+framework. OpenRES addresses this gap by providing an open-source,
+modular, and GUI-accessible QGIS plugin that automates the extraction of
+key hydrogeomorphic features necessary for FPZ classification. By
+integrating reproducible methods within a widely adopted open-source GIS
+platform, OpenRES promotes standardization, accessibility, and
+scalability in riverine ecosystem analyses.</p>
 </div>
 <div id="background" class="section level1">
-<h1>5.2. Background</h1>
-<p>Since the publication of the Riverine Ecosystem Synthesis (RES) in
-2006, evidence across five continents has emerged that supports the view
-that hydrogeomorphology is a keystone, physical factor that influences
-ecological community composition and ecosystem properties across rivers
-(<span class="citation">Thorp, Thoms, and Delong (2006)</span>, <span class="citation">Thorp et al. (2023)</span>). In contrast to the
-prevailing view of rivers as continuous, longitudinal gradients of
-physiochemical conditions (e.g. the River Continuum Concept, <span class="citation">Vannote et al. (1980)</span>), the RES poses a
-conception of rivers as downstream arrays of large, discontinuous, and
-repeating hydrogeomorphic patches, formed by catchment geomorphology and
-climate. Under the RES, these hydrogeomorphic patches or Functional
-Process Zones (FPZs) are classified at a scale between reaches and
-valleys (5 km - 10 km) using a set of hydrogeomorphic features:
-elevation, mean annual precipitation, geology class, valley width,
-valley floor width, valley side slopes, down valley slope, and river
+<h1>Background</h1>
+<p>Since the publication of the RES in 2006, evidence from rivers across
+five continents has demonstrated that hydrogeomorphology is a keystone
+physical driver shaping ecological community composition and ecosystem
+function. In contrast to the traditional view of rivers as continuous
+longitudinal gradients of physicochemical conditions (the River
+Continuum Concept; <span class="citation">Vannote et al. (1980)</span>),
+the RES conceptualizes river networks as downstream arrays of large,
+discrete, and repeating hydrogeomorphic patches formed by interactions
+among catchment geomorphology, climate, and hydrology (<span class="citation">Thorp, Thoms, and Delong (2010)</span>). Within the RES
+framework, FPZs are classified at an intermediate spatial scale
+(typically 5–10 km) between reaches and valleys, using a standardized
+set of hydrogeomorphic features: elevation, mean annual precipitation,
+geology class, valley width, valley-floor width, valley-side slopes,
+down-valley slope, river sinuosity, channel-belt width, and channel-belt
 sinuosity (<span class="citation">Thorp, Thoms, and Delong
-(2010)</span>). FPZs characterize the spatial variability in river
-behavior, describing how each segment of the channel governs flow
-dynamics, sediment transport, floodplain interactions, and the formation
-of diverse habitats (<span class="citation">Hestir (2007)</span>). Given
-that the RES applies to the entire river network and its watershed, from
-headwaters to confluence, it is not practical to collect the required
-data in the field, and so, specialized spatial tools are needed to
-extract these features across a watershed of interest.</p>
+(2010)</span>). FPZs characterize spatial variability in river behavior
+and delineate how each segment mediates flow dynamics, sediment
+transport, floodplain connectivity, and habitat diversity (<span class="citation">Hestir (2007)</span>). Because the RES applies to
+entire river networks and their watersheds, comprehensive classification
+requires spatially consistent data over large extents. Collecting the
+data needed is often impractical in the field. Consequently, automated,
+reproducible spatial tools are essential for extracting and integrating
+these hydrogeomorphic features across watersheds of interest.</p>
 </div>
 <div id="openres-audience" class="section level1">
-<h1>5.3. OpenRES Audience</h1>
+<h1>OpenRES Audience</h1>
 <p><code>OpenRES</code> is intended for students, instructors,
 researchers, and practitioners in river science, geomorphology,
 hydrology, and ecosystem management who use QGIS and need a
@@ -436,9 +438,9 @@ standardized, open-source tool to delineate FPZs and conduct studies on
 riverine ecosystems.</p>
 </div>
 <div id="openres-functionality" class="section level1">
-<h1>5.4. OpenRES Functionality</h1>
-<div id="prior-to-using-openres-data-preparation" class="section level2">
-<h2>5.4.1. Prior to using OpenRES: Data Preparation</h2>
+<h1>OpenRES Functionality</h1>
+<div id="data-preparation" class="section level2">
+<h2>Data Preparation</h2>
 <p>There are six required datasets needed prior to the extraction of
 hydrogeomorphic features along a user’s watershed of interest using
 OpenRES in QGIS:</p>
@@ -467,29 +469,47 @@ realistic extents, (3) generating 1–2 km² microsheds or isobasins from
 the DEM, and (4) applying vector operations (intersection, difference,
 polygon-to-line) to extract the combined boundaries of the valley floor
 and confining valley tops as a line layer.</p></li>
-<li><p><strong>Channel Belt</strong> (.shp): A line layer delineating
-the channel belt, defined as the portion of the valley floor occupied or
-recently influenced by river channel movement, including the active
-channel and associated depositional features. This layer can be created
-by (1) buffering the stream layer by an appropriate threshold for your
-river system, (2) converting that buffer into a line layer, and (3)
-manually edit the channel belt such that it contains the edges of the
-river meanders and observable depositional features.</p></li>
+<li><p><strong>Channel belt layer</strong> (.shp): A line layer
+delineating the channel belt, defined as the portion of the valley floor
+occupied or recently influenced by river channel movement, including the
+active channel and associated depositional features. This layer can be
+created by (1) using the <code>Generate Channel Belt</code> tool
+provided by <code>OpenRES</code> to create offset lines from your stream
+network at a specified width, and (2) manually edit the channel belt
+such that it contains the edges of the river meanders and observable
+depositional features.</p></li>
 </ul>
 </div>
-<div id="using-openres-feature-extraction" class="section level2">
-<h2>5.4.2. Using OpenRES: Feature Extraction</h2>
-<div id="geomorpology-tools" class="section level3">
-<h3>Geomorpology Tools</h3>
+<div id="using-openres" class="section level2">
+<h2>Using OpenRES</h2>
+<div id="geomorphology-tools" class="section level3">
+<h3>Geomorphology Tools</h3>
+<p>To aid in producing the <strong>valley-boundary line layer</strong>
+and the <strong>channel belt layer</strong>, OpenRES provides several
+geomorphology utilities that can be used prior to data extraction.</p>
 <ul>
-<li><strong>Valley Bottom Delination - Sechu</strong>:</li>
+<li><p><strong>Generate Channel Belt</strong>: This tool creates left
+and right offset lines from the user’s stream network by a user-defined
+distance, representing the lateral extent of the active or recently
+active channel zone. These offsets are merged into a single line layer,
+which should be manually refined by the user to match visible
+channel-belt boundaries. The output forms the basis for subsequent
+extraction of channel belt width and sinuosity.</p></li>
+<li><p><strong>Valley Floor Delineation - Sechu</strong>: This tool
+implements a modified cost-accumulation approach to identify the valley
+floor from a DEM (<span class="citation">Sechu et al. (2021)</span>).
+The algorithm propagates elevation cost outward from the channel until a
+threshold in slope is reached, effectively distinguishing low-relief
+floodplain areas from confining valley walls. The resulting polygon can
+be used as a starting point to produce the valley-floor boundaries
+needed for later transect intersection analyses.</p></li>
 </ul>
 </div>
 <div id="data-extraction-tools" class="section level3">
 <h3>Data Extraction Tools</h3>
-<p>The core functionality of <code>OpenRES</code> is contained in six
+<p>The core functionality of <code>OpenRES</code> is contained in seven
 data extraction tools, each of which is intended to be used sequentially
-to automate the extraction of fourteen hydrogeomorphic features.</p>
+to automate the extraction of fifteen hydrogeomorphic features.</p>
 <ul>
 <li><p><strong>[1] Generate Transects</strong>: The Generate Transects
 tool projects a perpendicular transect from the center of each user
@@ -509,24 +529,22 @@ Elevation (ELE), Precipitation (PRE), and Geology (GEO) tool uses the
 river network layer as the spatial reference, the tool samples elevation
 (ELE) from a user-specified DEM or elevation raster, mean annual
 precipitation (PRE) from a gridded climate/precipitation raster, and
-geology class (GEO) from a polygon geology layer or coded raster.
-Attributes are written back to the river segments center feature class
-so that each segment has a common set of physical descriptors.</p></li>
+geology class (GEO) from a polygon geology layer.</p></li>
 <li><p><strong>[3] Extract VW, VFW, and RAT</strong>: The Extract Valley
 Width (VW) and Valley Floor Width (VFW) tool uses the previously
 generated transects to quantify how wide the river valley is at each
 stream segment. For each transect, the tool identifies the first left
 and right intersections with the valley-boundary line layer, then
 measures the distance between those intersections to derive VFW. The
-second intersections of each side are used to derive VW.</p></li>
+second intersections of each side are used to derive VW. RAT is
+calculated as the ratio between VW and VFW.</p></li>
 <li><p><strong>[4] Extract LVS, RVS, and MVS</strong>: The Left Valley
 Slope (LVS), Right Valley Slope (RVS), and Mean Valley Slope (MVS) tool
 characterizes valley asymmetry by using the same transect–intersection
 framework. The tool samples elevation values at the left and right
 intersection points between the top of the microshed and the valley
-bottom intersection then computes RVS and LVS separately for each
-transect. MVS is calculated by summing the RVS and LVS, then dividing by
-2.</p></li>
+bottom intersection, then computes RVS and LVS separately for each
+transect. MVS is calculated by averaging the RVS and LVS.</p></li>
 <li><p><strong>[5] Extract DVS and SIN</strong>: The Down-Valley Slope
 (DVS) and River Sinuosity (SIN) tool summarizes along-channel controls
 on energy and planform. DVS is calculated by linking the start and end
@@ -535,24 +553,42 @@ downstream direction. SIN is computed by comparing the actual channel
 length of a segment to the straight-line distance between its
 endpoints.</p></li>
 <li><p><strong>[6] Extract CBW</strong>: The Extract Channel Belt Width
-(CBW)</p></li>
+(CBW) tool measures the lateral extent of the active channel system at
+each stream segment. For each transect, the tool intersects the “Channel
+Belt” layer and identifies the first left and right intersections
+relative to the transect midpoint. The distance between these
+intersections represents the Channel Belt Width (CBW).</p></li>
+<li><p><strong>[7] Extract LCS, RCS, and CBS</strong>: The Extract Left
+Channel Sinuosity (LCS), Right Channel Sinuosity (RCS), and Channel Belt
+Sinuosity (CBS) tool quantifies within-belt planform complexity. For
+each stream segment, LCS and RCS are computed by tracing the channel on
+the left and right halves of the channel belt and dividing that
+curvilinear distance by the corresponding straight-line distance between
+the starting and ending point of each channel belt segment. CBS is
+calculated as the mean sinuosity obtained between LCS and RCS.</p></li>
 </ul>
 </div>
 </div>
 <div id="after-openres-unsupervised-classification" class="section level2">
-<h2>5.4.3. After OpenRES: Unsupervised Classification</h2>
-<p>Once the user has the fourteen hydrogeomorphic features provided by
-OpenRES, they can export the river segments center shapefile containing
-these values to another software (Python or R) to perform unsupervised
-hierarchical classification to generate FPZ clusters (see examples in
-<span class="citation">Maasri et al. (2019)</span>, <span class="citation">Elgueta et al. (2019)</span>) . After classifying a
-river network into FPZs, research questions posed by the tenets of the
-Riverine Ecosystem Synthesis hypothesis (see <span class="citation">Thorp et al. (2023)</span> for full list) can be
-explored.</p>
+<h2>After OpenRES: Unsupervised Classification</h2>
+<p>After executing all seven extraction tools, each river-segment
+feature contains a complete suite of fifteen hydrogeomorphic features
+that collectively describe the longitudinal and lateral structure of the
+river corridor. These standardized metrics enable reproducible FPZ
+classification and facilitate cross-watershed comparisons. Users can
+export the resulting river-segment attribute table (or centerline
+shapefile) to statistical environments such as Python or R for
+unsupervised hierarchical clustering to delineate FPZ classes (see <span class="citation">Maasri et al. (2019)</span>; <span class="citation">Elgueta et al. (2019)</span>). The resulting FPZ
+clusters can then be joined back to the river network for spatial
+visualization and further analysis within QGIS. Once FPZs have been
+classified and mapped, researchers can evaluate the hypotheses posed by
+the Riverine Ecosystem Synthesis (RES) framework (see <span class="citation">Thorp et al. (2023)</span> for the complete list),
+including relationships among hydrogeomorphic structure, ecological
+composition, and ecosystem function across multiple spatial scales.</p>
 </div>
 </div>
 <div id="acknowledgements" class="section level1">
-<h1>5.5. Acknowledgements</h1>
+<h1>Acknowledgements</h1>
 <p><code>OpenRES</code> was developed by members of the Earth
 Observation and Remote Sensing Laboratory at the University of
 California, Merced. The authors would like to thank Matthew Rossi,
@@ -561,7 +597,7 @@ for their feedback, suggestions, and support during the development of
 OpenRES.</p>
 </div>
 <div id="references" class="section level1 unnumbered">
-<h1 class="unnumbered">5.6. References</h1>
+<h1 class="unnumbered">References</h1>
 <div id="refs" class="references csl-bib-body hanging-indent">
 <div id="ref-elgueta_2019" class="csl-entry">
 Elgueta, Anaysa, Martin C Thoms, Konrad Górski, Gustavo Díaz, and Evelyn
@@ -582,6 +618,13 @@ the <span>Functional</span> <span>Process</span> <span>Zone</span>
 Scale: <span>A</span> Case Study of Stream Macroinvertebrates in
 Endorheic Drainages.”</span> <em>Science of the Total Environment</em>
 677: 184–93.
+</div>
+<div id="ref-sechu_2021" class="csl-entry">
+Sechu, Gasper L., Bertel Nilsson, Bo V. Iversen, Mette B. Greve,
+Christen D. Børgesen, and Mogens H. Greve. 2021. <span>“A Stepwise GIS
+Approach for the Delineation of River Valley Bottom Within Drainage
+Basins Using a Cost Distance Accumulation Analysis.”</span>
+<em>Water</em> 13 (6). <a href="https://doi.org/10.3390/w13060827">https://doi.org/10.3390/w13060827</a>.
 </div>
 <div id="ref-thorp_2006" class="csl-entry">
 Thorp, James H, Martin C Thoms, and Michael D Delong. 2006. <span>“The

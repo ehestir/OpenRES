@@ -8,7 +8,7 @@
 
 If you use this plugin in your work, please cite it as:
 
-> **Cite:** Nesslage J, Hestir E. OpenRES (Open Riverine Ecosystem Synthesis): A QGIS plugin for automated extraction of hydrogeomorphic features to support functional process zone classification of river networks. Zenodo; 2025.
+> **Cite:** Nesslage, J., & Hestir, E. (2025). OpenRES (Open Riverine Ecosystem Synthesis): A QGIS plugin for automated extraction of hydrogeomorphic features to support functional process zone classification of river networks (Version 1.0.1) [Software]. Zenodo. <https://doi.org/10.5281/zenodo.17307006>
 
 ``` bibtex
 @software{nesslage2025OpenRES,
@@ -31,7 +31,7 @@ If you use this plugin in your work, please cite it as:
 
 ## General Information
 
-**OpenRES** enables QGIS users to extract nine required physical and environmental features along river segments (typically 5--10 km) to support classification of river networks into **Functional Process Zones (FPZs)**.
+**OpenRES** enables QGIS users to extract up to fifteen physical and environmental features along river segments (typically 5--10 km) to support classification of river networks into **Functional Process Zones (FPZs)**.
 
 **Functional Process Zone (FPZ)** classification is a method used to divide a river network into river valley scale (5-10 km) segments (or "zones") that share similar physical, hydrological, and geomorphic characteristics. Rather than treating a river as a continuous longitudinal gradient of changing physical conditions, FPZ classification recognizes that rivers are composed of a discontinuous set of hydrogeomorphic patches, each shaped by different landscape and hydrologic processes ([Hestir 2007](https://www.researchgate.net/profile/Erin-Hestir/publication/265026989_Functional_Process_Zones_and_the_River_Continuum_Concept/links/546248c00cf2c0c6aec1ade8/Functional-Process-Zones-and-the-River-Continuum-Concept.pdf)). These zones reflect how the river behaves in a given segment, including how it flows, how it transports sediment, how it interacts with its floodplain, and what types of habitats it supports. After classifying a river network in FPZs, research questions posed by the tenets of the Riverine Ecosystem Synthesis hypothesis ([Thorp et al. 2006](https://onlinelibrary.wiley.com/doi/abs/10.1002/rra.901), [Thorp et al. 2023](https://www.frontiersin.org/journals/ecology-and-evolution/articles/10.3389/fevo.2023.1184433/full)) can be explored.
 
@@ -49,28 +49,39 @@ There are six required datasets needed prior to the extraction of hydrogeomorphi
 
 -   **Valley-boundary line layer** (.shp): A line layer delineating both valley-bottom boundaries and the intersecting microsheds or isobasins. This layer is created by (1) delineating the valley bottom using `OpenRES` geomorphology tools or some other method, (2) manually editing outputs to remove holes and ensure realistic extents, (3) generating 1--2 km² microsheds or isobasins from the DEM, and (4) applying vector operations (intersection, difference, polygon-to-line) to extract the combined boundaries of the valley floor and confining valley tops as a line layer.
 
--   **Channel Belt** (.shp): A line layer delineating the channel belt, defined as the portion of the valley floor occupied or recently influenced by river channel movement, including the active channel and associated depositional features. This layer can be created by (1) creating offset lines called "LeftChannelBelt" and "RIghtChannelBelt" from your stream network after using [1] Generate Transects (to ensure lines have t_ID), offset by an appropriate width for your river system, (2) merging those lines into a line layer called "ChannelBelt", and (3) manually edit the channel belt such that it contains the edges of the river meanders and observable depositional features.
+-   **Channel Belt** (.shp): A line layer delineating the channel belt, defined as the portion of the valley floor occupied or recently influenced by river channel movement, including the active channel and associated depositional features. This layer can be created by (1) using the `Generate Channel Belt` tool provided by `OpenRES` to create offset lines from your stream network at a specified width, and (2) manually edit the channel belt such that it contains the edges of the river meanders and observable depositional features.
 
 ## Core Functionality
 
+### Geomorphology Tools
+
+To aid in producing the **valley-boundary line layer** and the **channel belt layer**, OpenRES provides several geomorphology utilities that can be used prior to data extraction.
+
+-   **Generate Channel Belt**: This tool creates left and right offset lines from the user's stream network by a user-defined distance, representing the lateral extent of the active or recently active channel zone. These offsets are merged into a single line layer, which should be manually refined by the user to match visible channel-belt boundaries. The output forms the basis for subsequent extraction of channel belt width and sinuosity.
+
+-   **Valley Floor Delineation - Sechu**: This tool implements a modified cost-accumulation approach to identify the valley floor from a DEM (based on methods described by [Sechu et al. 2021](https://www.mdpi.com/2073-4441/13/6/827)). The algorithm propagates elevation cost outward from the channel until a threshold in slope is reached, effectively distinguishing low-relief floodplain areas from confining valley walls. The resulting polygon can be used as a starting point to produce the valley-floor boundaries needed for later transect intersection analyses.
+
 ### Feature Extraction Tools
 
-As of this version of the plugin, the core functionality of OpenRES provides up to 12 features that can be used to delineate FPZs from river networks:
+As of this version of the plugin, the core functionality of OpenRES provides up to 15 features that can be used to delineate FPZs from river networks:
 
 -   **Elevation (ELE)**: Elevation value (often in meters), extracted from the center of each stream segment.
 -   **Mean Annual Precipitation (PRE)**: Mean annual precipitation value (often in mm), extracted from the center of each stream segment.
 -   **Geology (GEO)**: Geology field value, extracted from the center of each stream segment.
--   **Valley Floor Width (VFW)**: Width (in meters) between the first intersections of the transects for each stream segment on the left and right sides of the stream and the valley line layer. When correctly generated, the first intersection of the valley line layer should correspond with the boundaries of the valley floor.\
+-   **Valley Floor Width (VFW)**: Width (in meters) between the first intersections of the transects for each stream segment on the left and right sides of the stream and the valley line layer. When correctly generated, the first intersection of the valley line layer should correspond with the boundaries of the valley floor.
 -   **Valley Width (VW)**: Width (in meters) between the second intersections of the transects for each stream segment on the left and right sides of the stream and the valley line layer. When correctly generated, the second intersection of the valley line layer should correspond with tops of hydrologically connected basins that intersect the valley floor, which approximates the tops of valleys.
--   **Ratio of valley width and valley floor width (RAT)**: The ratio between valley width and valley floor width.
+-   **Ratio of valley width and valley floor width (RAT)**: The ratio between valley width and valley floor width. An indicator of whether a valley is confined/V-shaped or unconfined/U-shaped.
 -   **Right Valley Slope (RVS)**: Slope (in %) between the first and second intersection of a transect with the valley line layer on the right side of the river, as defined from a downstream direction. This essentially is the slope between the tops of the valley and the valley bottom on the right side of the river.
 -   **Left Valley Slope (LVS)**: Slope (in %) between the first and second intersection of a transect with the valley line layer on the left side of the river, as defined looking downstream. This essentially is the slope between the tops of the valley and the valley bottom on the left side of the river.
--   **Mean Valley Slope (MVS)**: The average lateral valley slope as calculated between the LVS and RVS.
--   **Down Valley Slope (DVS)**: The slope (in %) between the starting point and endpoint of a given stream segment.
+-   **Mean Valley Slope (MVS)**: The average lateral valley slope as calculated between the LVS and RVS. An indicator of whether a valley is confined/V-shaped or unconfined/U-shaped.
+-   **Down Valley Slope (DVS)**: The slope (in %) between the starting point and endpoint of a given stream segment. An indicator of the stream's gradient/power.
 -   **River Sinuosity (SIN)**: The ratio of the true stream distance and the straight line distance between the starting point and endpoint of a given stream segment.
 -   **Channel Belt Width (CBW)**: Width (in meters) of the channel belt, as measured by the intersecting transect.
+-   **Left Channel Sinuosity (LCS)**: The ratio of the true channel belt distance and the straight line distance between the starting point and endpoint of a given channel belt segment, measured from the left side.
+-   **Right Channel Sinuosity (RCS)**: The ratio of the true channel belt distance and the straight line distance between the starting point and endpoint of a given channel belt segment, measured from the right side.
+-   **Channel Belt Sinuosity (CBS)**: Average channel belt sinuosity between LCS and RCS, which should approximate the channel belt sinuosity of the river.
 
-These twelve features can then be used to classify stream networks using unsupervised hierarchical classification methods (see examples in [Thorp et al. 2010](https://books.google.com/books?hl=en&lr=&id=9N9rz8YH_u0C&oi=fnd&pg=PP1&dq=thorp+et+al+2010&ots=eBk_vZsNWA&sig=1XQ2cIyXRnD_t4t1MOtwe6xpQDQ#v=onepage&q=thorp%20et%20al%202010&f=false), [Elgueta et al. 2019](https://onlinelibrary.wiley.com/doi/full/10.1002/rra.3557), [Maasri et al. 2021](https://onlinelibrary.wiley.com/doi/full/10.1002/rra.3784)). The classes obtained using these methods define stream segments that share similar physical, hydrological, and geomorphic characteristics.
+These fifteen features (or a subset thereof) can then be used to classify stream networks using unsupervised hierarchical classification methods (see examples in [Thorp et al. 2010](https://books.google.com/books?hl=en&lr=&id=9N9rz8YH_u0C&oi=fnd&pg=PP1&dq=thorp+et+al+2010&ots=eBk_vZsNWA&sig=1XQ2cIyXRnD_t4t1MOtwe6xpQDQ#v=onepage&q=thorp%20et%20al%202010&f=false), [Elgueta et al. 2019](https://onlinelibrary.wiley.com/doi/full/10.1002/rra.3557), [Maasri et al. 2021](https://onlinelibrary.wiley.com/doi/full/10.1002/rra.3784)). The classes obtained using these methods define stream segments that share similar physical, hydrological, and geomorphic characteristics.
 
 ### Geomorphology Tools
 
@@ -147,8 +158,8 @@ Location: `Processing Toolbox > OpenRES > Feature Extraction`
 
 -   **River Network Layer** (polyline)
 -   **Valley Lines Layer** (line)
--   **Extension Increment** (optional, default = 5m)
--   **Max Length** (optional, default = 200m)
+-   **Extension Increment** (optional, default = 250m)
+-   **Max Length** (optional, default = 50000m)
 
 #### Outputs
 
@@ -193,9 +204,9 @@ Location: `Processing Toolbox > OpenRES > Feature Extraction`
 
 ------------------------------------------------------------------------
 
-### Step 3: Extract Valley Width (VW) and Valley Floor Width (VFW)
+### Step 3: Extract Valley Width (VW), Valley Floor Width (VFW), and their ratio (RAT)
 
-Use: `"[3] Extract VW and VFW"`\
+Use: `"[3] Extract VW, VFW", and RAT`\
 Location: `Processing Toolbox > OpenRES > Feature Extraction`
 
 ::: {style="text-align: center;"}
@@ -206,8 +217,8 @@ Location: `Processing Toolbox > OpenRES > Feature Extraction`
 
 -   **Transects Layer** (from Step 1)
 -   **Segment Centers Layer** (from Step 2)
--   **Valley Lines Layer** (same as Step 1)
--   **Stream Network Layer** (same as Step 1)
+-   **Valley Lines Layer**
+-   **Stream Network Layer**
 
 #### Outputs
 
@@ -225,9 +236,9 @@ Location: `Processing Toolbox > OpenRES > Feature Extraction`
 
 ------------------------------------------------------------------------
 
-### Step 4: Extract Side Slopes (LVS and RVS)
+### Step 4: Extract Side Slopes (LVS, RVS, and MVS)
 
-Use: `"[4] Extract LVS and RVS"`\
+Use: `"[4] Extract LVS, RVS, and MVS"`\
 Location: `Processing Toolbox > OpenRES > Feature Extraction`
 
 ::: {style="text-align: center;"}
@@ -267,7 +278,7 @@ Location: `Processing Toolbox > OpenRES > Feature Extraction`
 #### Inputs
 
 -   **Segment Centers Layer** (from Step 4)
--   **Stream Network Layer** (with `t_ID`)
+-   **Stream Network Layer**
 -   **Elevation Raster**
 
 #### Output
@@ -288,9 +299,9 @@ Location: `Processing Toolbox > OpenRES > Feature Extraction`
 
 ### Completion
 
-At the end of Step 5, your segment center point layer will contain **all 12 hydrogeomorphic attributes**:
+At the end of Step 5, your segment center point layer will contain **all 15 hydrogeomorphic attributes**:
 
--   `t_ID`, `ELE`, `PRE`, `GEO`, `VFW`, `VW`, `RAT`,`LVS`, `RVS`,`MVS`, `DVS`, `SIN`, `CBW`
+-   `t_ID`, `ELE`, `PRE`, `GEO`, `VFW`, `VW`, `RAT`,`LVS`, `RVS`,`MVS`, `DVS`, `SIN`, `CBW`, `LCS`, `RCS`, `CBS`
 
 ::: {style="text-align: center;"}
 <img src="imgs/openres_output_table.png" width="800"/>
@@ -311,6 +322,8 @@ Elgueta, Anaysa, Martin C Thoms, Konrad Górski, Gustavo Díaz, and Evelyn M Hab
 Hestir, Erin L. 2007. "Functional Process Zones and the River Continuum Concept." Center for Watershed Sciences, University of California, Davis, Los Angeles, USA.
 
 Maasri, Alain, James H Thorp, Jon K Gelhaus, Flavia Tromboni, Sudeep Chandra, and Scott J Kenner. 2019. "Communities Associated with the Functional Process Zone Scale: A Case Study of Stream Macroinvertebrates in Endorheic Drainages." Science of the Total Environment 677: 184--93.
+
+Sechu, Gasper L., Bertel Nilsson, Bo V. Iversen, Mette B. Greve, Christen D. Børgesen, and Mogens H. Greve. 2021. "A Stepwise GIS Approach for the Delineation of River Valley Bottom within Drainage Basins Using a Cost Distance Accumulation Analysis." *Water* 13 (6). <https://doi.org/10.3390/w13060827>.
 
 Thorp, James H, Martin C Thoms, and Michael D Delong. 2006. "The Riverine Ecosystem Synthesis: Biocomplexity in River Networks across Space and Time." River Research and Applications 22 (2): 123--47.
 
