@@ -26,7 +26,7 @@ from .algorithms.extract_point_data_algorithm import ExtractPointDataAlgorithm
 from .algorithms.extract_dvs_sin_algorithm import ExtractDVSAlgorithm
 from .algorithms.extract_side_slopes_algorithm import ExtractSideSlopesAlgorithm
 from .algorithms.extract_cbw_algorithm import ExtractCBWAlgorithm
-#from .algorithms.extract_cbs_algorithm import ExtractCBSAlgorithm
+from .algorithms.extract_cbs_algorithm import ExtractCBSAlgorithm
 
 # Geomorphology Tools
 from .algorithms.Sechu_valley_bottom_algorithm import SechuCostDistanceAlgorithm
@@ -82,7 +82,7 @@ class OpenRESProvider(QgsProcessingProvider):
         self.addAlgorithm(ExtractDVSAlgorithm())
         self.addAlgorithm(ExtractSideSlopesAlgorithm())
         self.addAlgorithm(ExtractCBWAlgorithm())
-       # self.addAlgorithm(ExtractCBSAlgorithm())
+        self.addAlgorithm(ExtractCBSAlgorithm())
         # Geomorphology Tools
         self.addAlgorithm(SechuCostDistanceAlgorithm())
         self.addAlgorithm(GenerateChannelBeltAlgorithm())
