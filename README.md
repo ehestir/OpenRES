@@ -77,7 +77,9 @@ Users should prepare the following **six datasets** for your watershed of intere
 
 Some of these layers may not be very common for most river systems (especially the **Valley-Boundary Line Layer** and **Channel Belt Layer**). For these less common datasets, `OpenRES` provides several geomorphology utility tools to allow users to create these datasets for their watershed of interest.
 
-**Data quality tips** - Ensure all inputs share the same projected CRS and unit (meters). - Snap and clean linework to avoid sliver gaps that can break intersections.
+**Data quality tips** - Ensure all inputs share the same projected CRS and unit (meters). 
+
+- Snap and clean linework to avoid sliver gaps that can break intersections.
 
 ------------------------------------------------------------------------
 
