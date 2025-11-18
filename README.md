@@ -120,8 +120,8 @@ Run these tools in order. Together, they generate all attributes required for FP
 To demonstrate the use of OpenRES, we have provided a dataset from the Eerste River catchment, a small watershed located in the Greater Cape Floristic Region of South Africa.
 
 <div align="center">
-  <img src="imgs/Eerste_watershed.png" width="600" alt="Eerste River catchment, South Africa"><br>
-  <sub><b> Eerste River catchment, South Africa</sub>
+  <img src="/imgs/Eerste_watershed.png" width="600" alt="Eerste River catchment, South Africa"><br>
+  <sub><b> Eerste River catchment, South Africa</b></sub>
 </div>
 
 The Eerste River originates in the Jonkershoek Mountains, part of the Hottentots-Holland mountain range, and flows westward through the Stellenbosch area before reaching the False Bay coast near Strand. It drains a catchment area of approximately 390 km². Dominated by fynbos vegetation, the area hosts numerous endemic plant species and is under increasing pressure from urban development, invasive species, and agricultural runoff.
