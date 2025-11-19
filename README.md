@@ -72,14 +72,16 @@ Users should prepare the following **six datasets** for your watershed of intere
 | **Digital Elevation Model (DEM) Layer**           | `.tif` | Elevation raster used for slopes, valley floors, and longitudinal gradients.                                                                                                                                                                                                                                                                                                  |
 | **Simplified Geology Layer**                      | `.shp` | Polygon layer with generalized classes (e.g., alluvial, mixed, bedrock). Typically a simplified version of a detailed map.                                                                                                                                                                                                                                                    |
 | **Geomorphically Corrected Stream Network Layer** | `.shp` | Stream lines generated from the DEM and manually corrected to follow observed channel positions in imagery for the analysis period (Whitebox Workflows recommended here).                                                                                                                                                                                                     |
-| **Valley-Boundary Line Layer**                    | `.shp` | Lines delineating both the valley floor boundary and valley-edge boundary. Suggested workflow: (1) delineate valley floor, (2) edit to remove holes and unrealistic extents, (3) derive 1--2 km² microsheds/isobasins from the DEM (Whitebox Workflows recommended here), (4) apply intersection/difference/polygon-to-line to extract combined boundaries as a line feature. |
-| **Channel Belt Layer**                            | `.shp` | Lines delineating the channel belt (active/recent fluvial influence, including channel and depositional features). Suggested workflow: (1) OpenRES → Generate Channel Belt, (2) manual refinement to match meanders and depositional forms visible in imagery.                                                                                                                |
+| **Valley-Boundary Line Layer**                    | `.shp` | Lines delineating both the valley floor boundary and valley-edge boundary. Suggested workflow: (1) delineate valley floor, (2) edit to remove holes and unrealistic extents, (3) derive 1-2 km² microsheds/isobasins from the DEM (Whitebox Workflows recommended here), (4) apply intersection/difference/polygon-to-line to extract combined boundaries as a line feature. |
+| **Channel Belt Layer**                            | `.shp` | Lines delineating the channel belt (active/recent fluvial influence, including channel and depositional features). Suggested workflow: (1) OpenRES → Geomorphology Tools → Generate Channel Belt, (2) manual refinement to match meanders and depositional forms visible in imagery.                                                                                                                |
 
 Some of these layers may not be very common for most river systems (especially the **Valley-Boundary Line Layer** and **Channel Belt Layer**). For these less common datasets, `OpenRES` provides several geomorphology utility tools to allow users to create these datasets for their watershed of interest.
 
-**Data quality tips** - Ensure all inputs share the same projected CRS and unit (meters). 
+**Data quality tips** 
 
-- Snap and clean linework to avoid sliver gaps that can break intersections.
+- Ensure all inputs share the same projected CRS and unit (meters) 
+
+- Snap and clean linework to avoid sliver gaps that can break intersections
 
 ------------------------------------------------------------------------
 
@@ -93,9 +95,7 @@ Use these tools to produce your **Valley-Boundary Line Layer** and **Channel Bel
 
 **Generate Channel Belt** Creates left/right offsets from the stream network to approximate the active or recently active channel zone, merges offsets, and produces a single line layer. Users should refine the result to match visible channel-belt edges. Outputs are used later for Channel Belt Width (CBW) and Channel Belt Sinuosity (CBS).
 
-**Valley Floor Delineation --- Sechu** Implements a modified cost-accumulation approach to delineate valley floors from a DEM (Sechu et al., 2021). The method propagates outward from the channel until a slope threshold is reached, separating low-relief valley bottoms from confining walls. The polygon output can be edited and converted to the linework needed for valley-boundary intersections.
-
-------------------------------------------------------------------------
+**Valley Floor Delineation - Sechu** Implements a modified cost-accumulation approach to delineate valley floors from a DEM (Sechu et al., 2021). The method propagates outward from the channel until a slope threshold is reached, separating low-relief valley bottoms from confining walls. The polygon output can be edited and converted to the linework needed for valley-boundary intersections.
 
 ### Data Extraction Tools
 
@@ -138,6 +138,7 @@ Before starting the OpenRES workflow:
     -   Elevation raster (.tif)
     -   Precipitation raster (.tif)
     -   Geology polygons with a classification field (e.g., `LITH`, `TYPE`, or `GEO`) (.shp)
+    -   Channel belt layer (.shp)
 -   The **OpenRES** plugin is installed and enabled in QGIS.
 -   The **Processing Toolbox** is open (via `Processing > Toolbox`).
 
@@ -304,7 +305,7 @@ Location: `Processing Toolbox > OpenRES > Feature Extraction`
 
 #### Output
 
--   **Final OpenRES Segment Centers** with:
+-   **Segment Centers** updated with:
     -   `DVS` -- Down-valley slope (%)
     -   `SIN` -- Sinuosity (unitless)
 
@@ -315,6 +316,64 @@ Location: `Processing Toolbox > OpenRES > Feature Extraction`
     -   `DVS` is calculated as `(start - end) / length * 100`.
     -   `SIN` is the ratio of actual segment length to straight-line distance.
 -   Features with insufficient geometry or elevation data are skipped.
+
+------------------------------------------------------------------------
+### Step 6: Extract Channel Belt Width (CBW)
+
+Use: `"[6] Extract CBW"`\
+Location: `Processing Toolbox > OpenRES > Feature Extraction`
+
+::: {style="text-align: center;"}
+<img src="imgs/extract_cbw_window.png" width="800"/>
+:::
+
+#### Inputs
+
+-   **Transects Layer** 
+-   **Segment Centers Layer** (from Step 5)
+-   **Channel Belt Layer** (may be generated from `Geomorphology > Generate Channel Belt`
+-   **River Network Layer**
+
+#### Output
+
+-   **Left Channel Belt Width Reference**
+-   **Right Channel Belt Width Reference**
+-   **Segment Centers** updated with:
+    -  Channel belt width
+
+#### Notes
+
+-   Uses intersection logic to find points where transects intersect the channel belt right and left reference.
+-   Then calculates distance between these intersections to compute 'CBW'.
+-   Reference points (left/right) are saved as point layers for inspection or QA/QC.
+
+------------------------------------------------------------------------
+
+### Step 7: Extract Channel Belt Width (CBW)
+
+Use: `"[7] Extract LCS"`\
+Location: `Processing Toolbox > OpenRES > Feature Extraction`
+
+::: {style="text-align: center;"}
+<img src="imgs/extract_cbw_window.png" width="800"/>
+:::
+
+#### Inputs
+
+-   **Transects Layer** 
+-   **Segment Centers Layer** (from Step 5)
+-   **Channel Belt Layer** (may be generated from `Geomorphology > Generate Channel Belt`
+-   **River Network Layer**
+
+#### Output
+
+-   **Left Channel Sinuoisty**
+-   **Right Channel Sinuosity**
+-   **Channel Belt Sinuosity**
+-   **Segment Centers** updated with:
+    -   Left channel sinuoisty
+    -   Right channel sinuoisty
+    -   Channel belt sinuosity 
 
 ------------------------------------------------------------------------
 
